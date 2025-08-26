@@ -1,4 +1,4 @@
-<form>
+<form x-data @submit-insertar-form.window.prevent="$el.requestSubmit()" wire:submit.prevent="insertar('{{ $modelo }}')">
     @if ($id)
         @livewire('CamposNoModificables', ['id' => $id, 'created_at' => $created_at, 'updated_at' => $updated_at], key($modelo . $id . $created_at . $updated_at))
     @endif
@@ -8,6 +8,7 @@
             <div class="form-group">
                 <label for="nombre_1">Nombre</label>
                 <input id="nombre_1" type="text" class="form-control" wire:model.live='nombre_1'>
+                @error('nombre_1')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -15,6 +16,7 @@
             <div class="form-group">
                 <label for="nombre_2">Segundo nombre</label>
                 <input id="nombre_2" type="text" class="form-control" wire:model.live='nombre_2'>
+                @error('nombre_2')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -22,6 +24,7 @@
             <div class="form-group">
                 <label for="apellido_1">Apellido</label>
                 <input id="apellido_1" type="text" class="form-control" wire:model.live='apellido_1'>
+                @error('apellido_1')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -29,6 +32,7 @@
             <div class="form-group">
                 <label for="apellido_2">Segundo apellido</label>
                 <input id="apellido_2" type="text" class="form-control" wire:model.live='apellido_2'>
+                @error('apellido_2')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -40,6 +44,7 @@
                 </div>
                 <input type="text" id="dni" class="form-control" wire:model.live='dni'>
             </div>
+            @error('dni')<small class="text-danger d-block">{{ $message }}</small>@enderror
         </div>
 
         <div class="col-md-3">
@@ -50,6 +55,7 @@
                         <option value={{ $genero->id }}> {{$genero->genero}} </option>
                     @endforeach
                 </select>
+                @error('genero_id')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -61,6 +67,7 @@
                 </div>
                 <input type="email" id="correo" class="form-control" wire:model.live='correo'>
             </div>
+            @error('correo')<small class="text-danger d-block">{{ $message }}</small>@enderror
         </div>
 
         <div class="col-md-3">
@@ -71,6 +78,7 @@
                 </div>
                 <input type="tel" id="celular" class="form-control" wire:model.live='celular'>
             </div>
+            @error('celular')<small class="text-danger d-block">{{ $message }}</small>@enderror
         </div>
 
         <div class="col-md-3">
@@ -82,13 +90,15 @@
                         <option value={{ $aula->id }} {{ $aula->id == $aula_id ? 'selected' : '' }}> {{$aula->grado->grado}} {{$aula->seccion->seccion}} </option>
                     @endforeach
                 </select>
+                @error('aula_id')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
         <div class="col-md-6">
             <div class="form-group">
                 <label for="observacion">Observación</label>
-                <textarea id="observacion" class="form-control" rows="2" wire:model.live='observacion'> {{$observacion}} </textarea>
+                <textarea id="observacion" class="form-control" rows="2" wire:model.live='observacion'></textarea>
+                @error('observacion')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
     </div>

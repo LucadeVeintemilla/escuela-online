@@ -2,35 +2,31 @@
 
 namespace App\Livewire;
 
-use App\Models\TipoContenido;
-use App\Models\Usuario;
 use Livewire\Component;
-use Faker\Factory;
 use Illuminate\Validation\Rule;
+use App\Models\Alumno;
+use App\Models\AsignaturaGrado;
+use App\Models\Calificacion;
 
-class FormularioContenido extends Component
+class FormularioCalificacionAsignaturaAlumno extends Component
 {
     public $modelo;
     public $id;
 
-    //objetos relacionados
-    public $usuarios;
-    public $tipoContenidos;
+    // relaciones
+    public $alumnos;
+    public $asignaturaGrados;
+    public $calificaciones;
 
-    //formulario
-    public $contenido;
-    public $usuario_id;
-    public $tipo_contenido_id;
-    public $path;
+    // formulario
+    public $alumno_id;
+    public $asignatura_grado_id;
+    public $calificacion_id;
     public $observacion;
 
     public $created_at;
     public $updated_at;
 
-    //campos extras
-    public $propietario;
-
-    //escuchadores
     protected $listeners = [
         'actualizar',
         'insertar',
@@ -39,24 +35,21 @@ class FormularioContenido extends Component
         'eliminar',
     ];
 
-    //OK
     public function eliminar()
     {
         $modeloString = 'App\\Models\\' . $this->modelo;
         $objeto = $modeloString::find($this->id);
-
         if ($objeto) {
             $objeto->delete();
             $this->dispatch('eliminarFila2', id: $this->id)->to(Fila::class);
         }
     }
 
-    //OK
-    public function formularioAlObjeto($modelo, &$objeto){
+    public function formularioAlObjeto($modelo, &$objeto)
+    {
         $modeloString = 'App\\Models\\' . $modelo;
         $camposModificables = $modeloString::camposModificables();
-
-        foreach ($camposModificables as $key => $campo) {
+        foreach ($camposModificables as $campo) {
             $objeto->$campo = (empty($this->$campo) ? null : $this->$campo);
         }
     }
@@ -64,22 +57,31 @@ class FormularioContenido extends Component
     protected function reglas(?int $id = null): array
     {
         return [
-            'contenido' => ['required', 'string', 'max:255'],
-            'tipo_contenido_id' => ['required', 'integer', 'exists:tipo_contenidos,id'],
-            'usuario_id' => ['required', 'integer', 'exists:usuarios,id'],
-            'path' => ['nullable', 'string', 'max:255'],
-            'observacion' => ['nullable', 'string', 'max:255'],
+            'alumno_id' => ['required', 'integer', 'exists:alumnos,id'],
+            'asignatura_grado_id' => ['required', 'integer', 'exists:asignatura_grados,id'],
+            'calificacion_id' => [
+                'required',
+                'integer',
+                'exists:calificacions,id',
+                // Evitar duplicados del mismo trio, ignorando soft deletes
+                Rule::unique('calificacion_asignatura_alumnos')
+                    ->where(fn($q) => $q->where('alumno_id', $this->alumno_id)
+                                          ->where('asignatura_grado_id', $this->asignatura_grado_id)
+                                          ->where('calificacion_id', $this->calificacion_id)
+                                          ->whereNull('deleted_at'))
+                    ->ignore($id),
+            ],
+            'observacion' => 'nullable|string|max:255',
         ];
     }
 
     public function insertar($modelo)
     {
-        // Forzar inserción
         $this->id = null;
         $this->validate($this->reglas());
 
         $modeloString = 'App\\Models\\' . $modelo;
-        $objeto =  new $modeloString;
+        $objeto = new $modeloString;
 
         $this->formularioAlObjeto($modelo, $objeto);
         $objeto->save();
@@ -93,9 +95,9 @@ class FormularioContenido extends Component
     public function actualizar()
     {
         $this->validate($this->reglas($this->id));
-        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'Contenido');
-        $objeto = $modeloString::withTrashed()->find($this->id);
+        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'CalificacionAsignaturaAlumno');
 
+        $objeto = $modeloString::withTrashed()->find($this->id);
         if (!$objeto) {
             return;
         }
@@ -116,72 +118,68 @@ class FormularioContenido extends Component
         }
     }
 
-    //OK
     public function consultar($modelo, $id)
     {
         $modeloString = 'App\\Models\\' . $modelo;
         $objeto = $modeloString::find($id);
-        
         if ($objeto) {
             $camposModificables = $modeloString::camposModificables();
-            foreach ($camposModificables as $key => $campo) {
+            foreach ($camposModificables as $campo) {
                 $this->$campo = $objeto->$campo;
             }
 
-            $camposNoModificables = $modeloString::camposNoModificables();
-            foreach ($camposNoModificables as $key => $campo) {
-                $this->$campo = $objeto->$campo;
+            if (method_exists($modeloString, 'camposNoModificables')) {
+                $camposNoModificables = $modeloString::camposNoModificables();
+                foreach ($camposNoModificables as $campo) {
+                    $this->$campo = $objeto->$campo;
+                }
             }
 
             $this->id = $id;
-            $this->propietario = $objeto->usuario->nombre_1 . ' ' . $objeto->usuario->nombre_2 . ' ' . $objeto->usuario->apellido_1 . ' ' . $objeto->usuario->apellido_2;   
         }
     }
 
-    //OK
-    public function inicializarRelaciones(){
-        $usuarios = Usuario::all();
-        $this->usuarios = $usuarios;
-        
-        $usuario = $usuarios->first();
-        $this->usuario_id = optional($usuario)->id;
-        $this->propietario = $usuario ? ($usuario->nombre_1 . ' ' . ($usuario->nombre_2 ?? '') . ' ' . $usuario->apellido_1 . ' ' . $usuario->apellido_2) : null;
+    public function inicializarRelaciones()
+    {
+        $alumnos = Alumno::with('usuario')->get();
+        $this->alumnos = $alumnos;
+        $this->alumno_id = optional($alumnos->first())->id;
 
-        $this->tipoContenidos = TipoContenido::all();
-        $this->tipo_contenido_id = optional($this->tipoContenidos->first())->id;
+        $ags = AsignaturaGrado::with(['asignatura', 'grado'])->get();
+        $this->asignaturaGrados = $ags;
+        $this->asignatura_grado_id = optional($ags->first())->id;
 
-        $faker = Factory::create();
-        $this->path = '/' . $faker->word;
+        $calificaciones = Calificacion::all();
+        $this->calificaciones = $calificaciones;
+        $this->calificacion_id = optional($calificaciones->first())->id;
     }
 
-    //OK
-    public function inicializar($modelo){
+    public function inicializar($modelo)
+    {
         $modeloString = 'App\\Models\\' . $modelo;
-        $camposModificables = $modeloString::camposModificables();
-
-        foreach ($camposModificables as $key => $campo) {
-            $this->$campo = null;
+        if (method_exists($modeloString, 'camposModificables')) {
+            $camposModificables = $modeloString::camposModificables();
+            foreach ($camposModificables as $campo) {
+                $this->$campo = null;
+            }
         }
 
         $this->inicializarRelaciones();
         $this->id = null;
     }
 
-    //OK
     public function mount($modelo, $id)
     {
-        $this->inicializar($modelo);        
-
+        $this->inicializar($modelo);
         if ($id) {
             $this->consultar($modelo, $id);
         }
-
         $this->modelo = $modelo;
         $this->id = $id;
     }
 
     public function render()
     {
-        return view('livewire.formulario-contenido');
+        return view('livewire.formulario-calificacion-asignatura-alumno');
     }
 }

@@ -111,7 +111,7 @@
                 ['titulo' => 'Tabla Tutores',
                 'modelo' => 'Tutor',
                 'pagina' => 1, 
-                'objetosPagina' => 5])
+                'objetosPagina' => 15])
         @break
 
         @case('14')
@@ -119,7 +119,7 @@
                 ['titulo' => 'Tabla Alumno',
                 'modelo' => 'Alumno',
                 'pagina' => 1, 
-                'objetosPagina' => 5])
+                'objetosPagina' => 15])
         @break
         
         @case('15')

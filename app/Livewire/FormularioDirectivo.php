@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Genero;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 
 class FormularioDirectivo extends Component
 {
@@ -43,7 +44,7 @@ class FormularioDirectivo extends Component
         $objeto = $modeloString::find($this->id);
 
         if ($objeto) {
-            $objeto->delete();
+            $objeto->forceDelete();
             $this->dispatch('eliminarFila2', id: $this->id)->to(Fila::class);
         }
     }
@@ -54,36 +55,88 @@ class FormularioDirectivo extends Component
         $camposModificables = $modeloString::camposModificables();
 
         foreach ($camposModificables as $key => $campo) {
-            $objeto->$campo = (empty($this->$campo) ? null : $this->$campo);
+            $objeto->$campo = ($this->$campo === '' ? null : $this->$campo);
         }
     }
 
-    //OK
-    public function insertar($modelo)
+    protected function reglas(?int $id = null): array
     {
-        if (!$this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto =  new $modeloString;
-    
-            $this->formularioAlObjeto($modelo, $objeto);
-            $objeto->save();
-    
-            $this->dispatch('actualizarMasivo')->to(Tabla::class);
-        }
+        return [
+            'nombre_1'   => 'required|string|max:255',
+            'nombre_2'   => 'nullable|string|max:255',
+            'apellido_1' => 'required|string|max:255',
+            'apellido_2' => 'required|string|max:255',
+            'dni'        => [
+                'required',
+                'digits:8',
+                Rule::unique('directivos', 'dni')
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
+            ],
+            'genero_id'  => 'required|exists:generos,id',
+            'correo'     => [
+                'nullable',
+                'email',
+                Rule::unique('directivos', 'correo')
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
+            ],
+            'celular'    => [
+                'nullable',
+                'string',
+                Rule::unique('directivos', 'celular')
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
+            ],
+            'observacion'=> 'nullable|string|max:255',
+        ];
     }
+
+    public function insertar($modelo)
+{
+    // Asegura que SIEMPRE se inserte un nuevo registro
+    $this->id = null;
+
+    $this->validate($this->reglas());
+    $modeloString = 'App\\Models\\' . $modelo;
+    $objeto = new $modeloString;
+
+    $this->formularioAlObjeto($modelo, $objeto);
+    $objeto->save();
+
+    // Refrescar tabla y llevar a última página para ver el nuevo registro
+    $this->dispatch('actualizarMasivo')->to(Tabla::class);
+    $this->dispatch('irALaUltimaPagina')->to(Tabla::class);
+
+    // Cerrar modal de inserción: dispara evento JS en window (compatible v2/v3)
+    $this->js("window.dispatchEvent(new CustomEvent('close-insert-modal'))");
+
+    $this->inicializar($modelo);
+}
 
     //OK
     public function actualizar()
     {
-        dump('ok');
-        $modeloString = 'App\\Models\\' . $this->modelo;
-        $objeto = $modeloString::find($this->id);
+        $this->validate($this->reglas($this->id));
+        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'Directivo');
 
-        if ($objeto) {
-            $this->formularioAlObjeto($this->modelo, $objeto);
-            $objeto->update();
+        $objeto = $modeloString::withTrashed()->find($this->id);
+        if (!$objeto) {
+            return; 
+        }
+        $campos = $modeloString::camposModificables();
+        $data = [];
+        foreach ($campos as $campo) {
+            $data[$campo] = ($this->$campo === '' ? null : $this->$campo);
+        }
 
-            $this->dispatch('actualizar', $objeto->id)->to(Fila::class);
+        $objeto->forceFill($data);
+        $saved = $objeto->save();
+        if ($saved) {
+            $this->dispatch('actualizar')->to(Fila::class);
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+            $this->js("$('#modalDetallesObjeto').modal('hide')");
         }
     }
 

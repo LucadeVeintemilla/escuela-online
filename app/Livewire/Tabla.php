@@ -52,7 +52,8 @@ class Tabla extends Component
 
     //OK
     public function setTotalObjetos(){
-        $this->totalObjetos = $this->modeloString::count();
+        // Include soft-deleted rows in the total count
+        $this->totalObjetos = $this->modeloString::withTrashed()->count();
         if ($this->pagina >= $this->totalPaginas) {
             $this->pagina = $this->totalPaginas;
         }
@@ -78,12 +79,14 @@ class Tabla extends Component
 
     //OK
     public function paginar(){
-        $this->totalObjetos = $this->modeloString::count();
+        // Include soft-deleted rows in the total count
+        $this->totalObjetos = $this->modeloString::withTrashed()->count();
         $this->totalPaginas = ceil($this->totalObjetos / $this->objetosPagina);
         if ($this->pagina > $this->totalPaginas) {
             $this->pagina = $this->totalPaginas;
         }
-        $this->objetosPaginados = $this->modeloString::all()->forPage($this->pagina,$this->objetosPagina);
+        // Bring both active and soft-deleted rows
+        $this->objetosPaginados = $this->modeloString::withTrashed()->get()->forPage($this->pagina,$this->objetosPagina);
     }
 
     public function setEncabezados(){

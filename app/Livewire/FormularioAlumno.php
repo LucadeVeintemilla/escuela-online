@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Genero;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 
 class FormularioAlumno extends Component
 {
@@ -34,6 +35,23 @@ class FormularioAlumno extends Component
         'eliminar',
     ];
 
+    protected function reglas(?int $id = null): array
+    {
+        return [
+            'nombre_1'   => 'required|string|max:255',
+            'nombre_2'   => 'nullable|string|max:255',
+            'apellido_1' => 'required|string|max:255',
+            'apellido_2' => 'required|string|max:255',
+            'dni'        => [
+                'required',
+                'digits:8',
+                Rule::unique('alumnos', 'dni')->ignore($id)->whereNull('deleted_at'),
+            ],
+            'genero_id'  => 'required|exists:generos,id',
+            'observacion'=> 'nullable|string|max:255',
+        ];
+    }
+
     //OK
     public function eliminar()
     {
@@ -59,15 +77,25 @@ class FormularioAlumno extends Component
     //OK
     public function insertar($modelo)
     {
-        if (!$this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto =  new $modeloString;
-    
-            $this->formularioAlObjeto($modelo, $objeto);
-            $objeto->save();
-    
-            $this->dispatch('actualizarMasivo')->to(Tabla::class);
-        }
+        // Siempre inserta un nuevo registro
+        $this->id = null;
+
+        $this->validate($this->reglas());
+        $modeloString = 'App\\Models\\' . $modelo;
+        $objeto =  new $modeloString;
+
+        $this->formularioAlObjeto($modelo, $objeto);
+        $objeto->save();
+
+        // Refrescar y navegar a última página
+        $this->dispatch('actualizarMasivo')->to(Tabla::class);
+        $this->dispatch('irALaUltimaPagina')->to(Tabla::class);
+
+        // Cerrar modal
+        $this->js("window.dispatchEvent(new CustomEvent('close-insert-modal'))");
+
+        // Resetear formulario
+        $this->inicializar($modelo);
     }
 
     //OK

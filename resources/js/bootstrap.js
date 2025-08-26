@@ -30,3 +30,29 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
 //     enabledTransports: ['ws', 'wss'],
 // });
+
+// Utilidad: cerrar modal y limpiar backdrops cuando Livewire lo solicite
+window.addEventListener('close-modal-tipo-contenido', () => {
+    try {
+        // Si usas Bootstrap 4/5 con jQuery disponible
+        if (window.$) {
+            const $ = window.$;
+            $('#modalDetallesObjeto').modal('hide');
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css('overflow', '');
+        } else {
+            // Fallback sin jQuery
+            const modal = document.getElementById('modalDetallesObjeto');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+                modal.style.display = 'none';
+            }
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+        }
+    } catch (e) {
+        console && console.warn && console.warn('close-modal-tipo-contenido fallback', e);
+    }
+});

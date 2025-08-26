@@ -1,4 +1,4 @@
-<form>
+<form x-data @submit-insertar-form.window.prevent="$el.requestSubmit()" @submit-actualizar-form.window.prevent="$wire.actualizar()" wire:submit.prevent="insertar('{{ $modelo }}')">
     @if ($id)
         @livewire('CamposNoModificables', ['id' => $id, 'created_at' => $created_at, 'updated_at' => $updated_at],
         key($modelo . $id . $created_at . $updated_at))
@@ -16,6 +16,7 @@
             <div class="form-group">
                 <label for="actividad"> Título </label>
                 <input id="actividad" type="text" class="form-control" wire:model.live='actividad'>
+                @error('actividad')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -25,6 +26,7 @@
                 <div class="input-group date inicializar" id="picker-date-time-inicio{{$id}}" data-target-input="nearest">
                     <input type="text" class="form-control datetimepicker-input" id="inicio"
                         data-target="#picker-date-time-inicio{{$id}}" data-toggle="datetimepicker" wire:model.live='inicio'/>
+                    @error('inicio')<small class="text-danger d-block">{{ $message }}</small>@enderror
                     <div class="input-group-append" data-target="#picker-date-time-inicio{{$id}}" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="bi bi-calendar4-week"></i></div>
                     </div>
@@ -45,6 +47,7 @@
                 <div class="input-group date inicializar" id="picker-date-time-fin{{$id}}" data-target-input="nearest">
                     <input type="text" class="form-control datetimepicker-input" id="fin"
                         data-target="#picker-date-time-fin{{$id}}" data-toggle="datetimepicker" wire:model.live='fin'/>
+                    @error('fin')<small class="text-danger d-block">{{ $message }}</small>@enderror
                     <div class="input-group-append" data-target="#picker-date-time-fin{{$id}}" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="bi bi-calendar4-week"></i></div>
                     </div>
@@ -62,7 +65,8 @@
             <div class="form-group">
                 <label for="descripcion">Descripción</label>
                 <textarea id="descripcion" class="form-control" rows="2"
-                    wire:model.live='descripcion'> {{$descripcion}} </textarea>
+                    wire:model.live='descripcion'></textarea>
+                @error('descripcion')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -70,7 +74,8 @@
             <div class="form-group">
                 <label for="observacion">Observación</label>
                 <textarea id="observacion" class="form-control" rows="2"
-                    wire:model.live='observacion'> {{$observacion}} </textarea>
+                    wire:model.live='observacion'></textarea>
+                @error('observacion')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
     </div>

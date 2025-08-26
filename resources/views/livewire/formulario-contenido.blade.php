@@ -1,4 +1,4 @@
-<form>
+<form x-data @submit-insertar-form.window.prevent="$el.requestSubmit()" @submit-actualizar-form.window.prevent="$wire.actualizar()" wire:submit.prevent="insertar('{{ $modelo }}')">
     @if ($id)
     @livewire('CamposNoModificables', ['id' => $id, 'created_at' => $created_at, 'updated_at' => $updated_at],
     key($modelo . $id . $created_at . $updated_at))
@@ -28,6 +28,7 @@
             <div class="form-group">
                 <label for="contenido">Recurso</label>
                 <input id="contenido" type="text" class="form-control" wire:model.live='contenido'>
+                @error('contenido')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
@@ -39,14 +40,15 @@
                     <option value={{ $tipo->id }}> {{$tipo->tipo}} </option>
                     @endforeach
                 </select>
+                @error('tipo_contenido_id')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
 
         <div class="col-md-6">
             <div class="form-group">
                 <label for="observacion">Observación</label>
-                <textarea id="observacion" class="form-control" rows="2" wire:model.live='observacion'> {{$observacion}} 
-                            </textarea>
+                <textarea id="observacion" class="form-control" rows="2" wire:model.live='observacion'></textarea>
+                @error('observacion')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
     </div>  

@@ -3,6 +3,9 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FormularioTipoContenido extends Component
 {
@@ -18,7 +21,6 @@ class FormularioTipoContenido extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -47,33 +49,83 @@ class FormularioTipoContenido extends Component
         }
     }
 
-    //OK
-    public function insertar($modelo)
+    protected function reglas(?int $id = null): array
     {
-        if (!$this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto =  new $modeloString;
-    
-            $this->formularioAlObjeto($modelo, $objeto);
-            $objeto->save();
-    
-            $this->dispatch('actualizarMasivo')->to(Tabla::class);
-        }
+        return [
+            'tipo' => ['required', 'string', 'max:255', Rule::unique('tipo_contenidos', 'tipo')->ignore($id)->whereNull('deleted_at')],
+            'observacion' => ['nullable', 'string', 'max:255'],
+        ];
     }
 
-    //OK
-    public function actualizar($modelo, $id)
+    public function insertar($modelo)
     {
-        if ($id == $this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto = $modeloString::find($id);
-    
-            if ($objeto) {
-                $this->formularioAlObjeto($modelo, $objeto);
-                $objeto->update();
+        // Forzar inserción
+        $this->id = null;
+        $this->validate($this->reglas());
+
+        $modeloString = 'App\\Models\\' . $modelo;
+        $objeto =  new $modeloString;
+
+        $this->formularioAlObjeto($modelo, $objeto);
+        $objeto->save();
+
+        $this->dispatch('actualizarMasivo')->to(Tabla::class);
+        $this->dispatch('irALaUltimaPagina')->to(Tabla::class);
+        $this->js("window.dispatchEvent(new CustomEvent('close-insert-modal'))");
+        $this->inicializar($modelo);
+    }
+
+    public function actualizar()
+    {
+        Log::info('TipoContenido actualizar: inicio', [
+            'this_id' => $this->id,
+            'this_modelo' => $this->modelo,
+            'tipo' => $this->tipo,
+            'observacion' => $this->observacion,
+        ]);
+        $this->validate($this->reglas($this->id));
+        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'TipoContenido');
+        $objeto = $modeloString::withTrashed()->find($this->id);
+
+        if (!$objeto) {
+            Log::warning('TipoContenido actualizar: objeto no encontrado', ['id' => $this->id]);
+            return;
+        }
+
+        // Normalizar entradas
+        $this->tipo = is_string($this->tipo) ? trim($this->tipo) : $this->tipo;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
+        $campos = $modeloString::camposModificables();
+        $data = [];
+        foreach ($campos as $campo) {
+            $data[$campo] = ($this->$campo === '' ? null : $this->$campo);
+        }
+        Log::info('TipoContenido actualizar: datos a guardar', $data);
+
+        DB::beginTransaction();
+        try {
+            $objeto->forceFill($data);
+            $saved = $objeto->save();
+            $objeto->refresh();
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('TipoContenido actualizar: error al guardar', ['id' => $this->id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+
+        Log::info('TipoContenido actualizar: resultado de guardado', ['saved' => $saved, 'id' => $objeto->id, 'tipo' => $objeto->tipo]);
+        if ($saved) {
+            // Sincronizar propiedades para evitar que el formulario "revierte" visualmente
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
             }
-    
-            $this->dispatch('actualizar', $objeto->id)->to(Fila::class);
+            $this->dispatch('actualizar', id: $objeto->id)->to(Fila::class);
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+            // Notificar al front para cerrar el modal y limpiar el backdrop
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-tipo-contenido'))");
         }
     }
 

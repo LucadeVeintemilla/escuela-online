@@ -69,6 +69,5 @@
     <script src="admin-lte/dist/js/adminlte.min.js"></script>
 
     @livewireScripts
-</script>
   </body>
 </html>

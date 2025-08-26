@@ -37,6 +37,34 @@ class CalificacionAsignaturaAlumno extends Model
         ];
     }
 
+    // Estructura para la Tabla/Fila
+    static public function camposTabla(){
+        return [
+            ['ID', 'at', ['id']],
+            ['Alumno', 'fk', ['alumno' => ['nombre_1', 'apellido_1']]],
+            ['Asignatura', 'fk', ['asignatura' => ['asignatura']]],
+            ['Grado', 'fk', ['grado' => ['grado']]],
+            ['Calificación', 'fk', ['calificacion' => ['calificacion']]],
+            ['Observación', 'at', ['observacion']],
+        ];
+    }
+
+    static public function camposModificables(){
+        return [
+            'alumno_id',
+            'asignatura_grado_id',
+            'calificacion_id',
+            'observacion',
+        ];
+    }
+
+    static public function camposNoModificables(){
+        return [
+            'created_at',
+            'updated_at',
+        ];
+    }
+
     public function alumno(): BelongsTo
     {
         return $this->belongsTo(Alumno::class);
@@ -59,8 +87,22 @@ class CalificacionAsignaturaAlumno extends Model
         return $this->AsignaturaGrado->grado();
     }
 
-    public function Calificacion(): BelongsTo
+    // Relación en minúscula para property access en Blade
+    public function calificacion(): BelongsTo { return $this->belongsTo(Calificacion::class); }
+
+    // Accessors para soportar $objeto->usuario, $objeto->asignatura, $objeto->grado en la vista de fila
+    public function getUsuarioAttribute()
     {
-        return $this->belongsTo(Calificacion::class);
+        return optional($this->alumno)->usuario;
+    }
+
+    public function getAsignaturaAttribute()
+    {
+        return optional($this->AsignaturaGrado)->asignatura;
+    }
+
+    public function getGradoAttribute()
+    {
+        return optional($this->AsignaturaGrado)->grado;
     }
 }

@@ -20,6 +20,21 @@ class AsignaturaGrado extends Model
         ];
     }
 
+    static public function camposModificables(){
+        return [
+            'asignatura_id',
+            'grado_id',
+            'observacion',
+        ];
+    }
+
+    static public function camposNoModificables(){
+        return [
+            'created_at',
+            'updated_at',
+        ];
+    }
+
     public function asignatura(): BelongsTo
     {
         return $this->belongsTo(Asignatura::class);

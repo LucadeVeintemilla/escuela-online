@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Aula;
 use App\Models\Genero;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 
 class FormularioDocente extends Component
 {
@@ -48,7 +49,7 @@ class FormularioDocente extends Component
         $objeto = $modeloString::find($this->id);
 
         if ($objeto) {
-            $objeto->delete();
+            $objeto->forceDelete();
             $this->dispatch('eliminarFila2', id: $this->id)->to(Fila::class);
         }
     }
@@ -59,36 +60,70 @@ class FormularioDocente extends Component
         $camposModificables = $modeloString::camposModificables();
 
         foreach ($camposModificables as $key => $campo) {
-            $objeto->$campo = (empty($this->$campo) ? null : $this->$campo);
+            $objeto->$campo = ($this->$campo === '' ? null : $this->$campo);
         }
+    }
+
+    protected function reglas(?int $id = null): array
+    {
+        return [
+            'nombre_1'   => 'required|string|max:255',
+            'nombre_2'   => 'nullable|string|max:255',
+            'apellido_1' => 'required|string|max:255',
+            'apellido_2' => 'required|string|max:255',
+            'dni'        => [
+                'required',
+                'digits:8',
+                Rule::unique('docentes', 'dni')->ignore($id)->whereNull('deleted_at'),
+            ],
+            'genero_id'  => 'required|exists:generos,id',
+            'aula_id'    => 'nullable|exists:aulas,id',
+            'correo'     => [
+                'nullable', 'email',
+                Rule::unique('docentes', 'correo')->ignore($id)->whereNull('deleted_at'),
+            ],
+            'celular'    => [
+                'nullable', 'string',
+                Rule::unique('docentes', 'celular')->ignore($id)->whereNull('deleted_at'),
+            ],
+            'observacion'=> 'nullable|string|max:255',
+        ];
     }
 
     //OK
     public function insertar($modelo)
     {
-        if (!$this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto =  new $modeloString;
-    
-            $this->formularioAlObjeto($modelo, $objeto);
-            $objeto->save();
-    
-            $this->dispatch('actualizarMasivo')->to(Tabla::class);
-        }
+        // Siempre inserta un nuevo registro
+        $this->id = null;
+
+        $this->validate($this->reglas());
+        $modeloString = 'App\\Models\\' . $modelo;
+        $objeto =  new $modeloString;
+
+        $this->formularioAlObjeto($modelo, $objeto);
+        $objeto->save();
+
+        // Refrescar y navegar a última página
+        $this->dispatch('actualizarMasivo')->to(Tabla::class);
+        $this->dispatch('irALaUltimaPagina')->to(Tabla::class);
+
+        // Cerrar modal
+        $this->js("window.dispatchEvent(new CustomEvent('close-insert-modal'))");
+
+        // Resetear formulario
+        $this->inicializar($modelo);
     }
 
     //OK
-    public function actualizar($modelo, $id)
+    public function actualizar()
     {
-        if ($id == $this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto = $modeloString::find($id);
-    
-            if ($objeto) {
-                $this->formularioAlObjeto($modelo, $objeto);
-                $objeto->update();
-            }
-    
+        $this->validate($this->reglas($this->id));
+        $modeloString = 'App\\Models\\' . $this->modelo;
+        $objeto = $modeloString::find($this->id);
+
+        if ($objeto) {
+            $this->formularioAlObjeto($this->modelo, $objeto);
+            $objeto->update();
             $this->dispatch('actualizar', $objeto->id)->to(Fila::class);
         }
     }

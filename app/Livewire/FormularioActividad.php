@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Usuario;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 
 class FormularioActividad extends Component
 {
@@ -56,32 +57,60 @@ class FormularioActividad extends Component
         }
     }
 
-    //OK
-    public function insertar($modelo)
+    protected function reglas(?int $id = null): array
     {
-        if (!$this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto =  new $modeloString;
-    
-            $this->formularioAlObjeto($modelo, $objeto);
-            $objeto->save();
-    
-            $this->dispatch('actualizarMasivo')->to(Tabla::class);
-        }
+        return [
+            'actividad' => ['required', 'string', 'max:255'],
+            'descripcion' => ['nullable', 'string', 'max:255'],
+            'inicio' => ['required', 'date'],
+            'fin' => ['required', 'date', 'after_or_equal:inicio'],
+            'usuario_id' => ['required', 'integer', 'exists:usuarios,id'],
+            'observacion' => ['nullable', 'string', 'max:255'],
+        ];
     }
 
-    //OK
+    public function insertar($modelo)
+    {
+        // Forzar inserción
+        $this->id = null;
+        $this->validate($this->reglas());
+
+        $modeloString = 'App\\Models\\' . $modelo;
+        $objeto =  new $modeloString;
+
+        $this->formularioAlObjeto($modelo, $objeto);
+        $objeto->save();
+
+        $this->dispatch('actualizarMasivo')->to(Tabla::class);
+        $this->dispatch('irALaUltimaPagina')->to(Tabla::class);
+        $this->js("window.dispatchEvent(new CustomEvent('close-insert-modal'))");
+        $this->inicializar($modelo);
+    }
+
     public function actualizar()
     {
-        $modeloString = 'App\\Models\\' . $this->modelo;
-        $objeto = $modeloString::find($this->id);
+        $this->validate($this->reglas($this->id));
+        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'Actividad');
+        $objeto = $modeloString::withTrashed()->find($this->id);
 
-        if ($objeto) {
-            $this->formularioAlObjeto($modelo, $objeto);
-            $objeto->update();
+        if (!$objeto) {
+            return;
         }
 
-        $this->dispatch('actualizar', $objeto->id)->to(Fila::class);
+        $campos = $modeloString::camposModificables();
+        $data = [];
+        foreach ($campos as $campo) {
+            $data[$campo] = ($this->$campo === '' ? null : $this->$campo);
+        }
+
+        $objeto->forceFill($data);
+        $saved = $objeto->save();
+        if ($saved) {
+            $this->dispatch('actualizar')->to(Fila::class);
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+            $this->js("$('#modalDetallesObjeto').modal('hide')");
+        }
     }
 
     //OK
@@ -112,8 +141,8 @@ class FormularioActividad extends Component
         $this->usuarios = $usuarios;
 
         $usuario = $usuarios->first();
-        $this->usuario_id = $usuario->id;
-        $this->creador = $usuario->nombre_1 . ' ' . $usuario->nombre_2 . ' ' . $usuario->apellido_1 . ' ' . $usuario->apellido_2;
+        $this->usuario_id = optional($usuario)->id;
+        $this->creador = $usuario ? ($usuario->nombre_1 . ' ' . ($usuario->nombre_2 ?? '') . ' ' . $usuario->apellido_1 . ' ' . $usuario->apellido_2) : null;
 
         $this->inicio = now()->format('Y-m-d H:i:s');
         $this->fin = now()->format('Y-m-d H:i:s');

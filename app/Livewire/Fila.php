@@ -31,7 +31,7 @@ class Fila extends Component
 
     //OK
     public function eliminarFila(){
-        $this->objeto->delete();
+        $this->objeto->forceDelete();
         $this->dispatch('paginar')->to(Tabla::class);
     }
 
@@ -52,7 +52,23 @@ class Fila extends Component
 
     //OK
     public function actualizar(){
-        $this->dispatch('refresh');
+        // If objeto is null (e.g., after insert/refresh), avoid dereferencing and request a table refresh
+        if (!$this->objeto) {
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+            return;
+        }
+
+        // Re-consult the database to obtain the current values of the record
+        $fresh = $this->modeloString::find($this->objeto->id);
+        if ($fresh) {
+            $this->objeto = $fresh;
+            $this->dispatch('$refresh');
+        } else {
+            // If the record no longer exists, repaginate the table so this row is removed
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+        }
     }
 
     //OK

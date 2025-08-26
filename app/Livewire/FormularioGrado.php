@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 
 class FormularioGrado extends Component
 {
@@ -51,40 +52,68 @@ class FormularioGrado extends Component
         }
     }
 
-    //OK
-    public function insertar($modelo)
+    protected function reglas(?int $id = null): array
     {
-        if (!$this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto =  new $modeloString;
-    
-            $this->formularioAlObjeto($modelo, $objeto);
-            
-            $objeto->grado = $this->grado;
-            $objeto->abreviatura = $this->abreviatura;
-            
-            dump($objeto);
-
-
-            $objeto->save();
-    
-            $this->dispatch('actualizarMasivo')->to(Tabla::class);
-        }
+        return [
+            'grado'       => [
+                'required',
+                'string',
+                Rule::unique('grados', 'grado')
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
+            ],
+            'abreviatura' => [
+                'nullable',
+                'string',
+                Rule::unique('grados', 'abreviatura')
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
+            ],
+            'observacion' => 'nullable|string|max:255',
+        ];
     }
 
-    //OK
-    public function actualizar($modelo, $id)
+    public function insertar($modelo)
     {
-        if ($id == $this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto = $modeloString::find($id);
-    
-            if ($objeto) {
-                $this->formularioAlObjeto($modelo, $objeto);
-                $objeto->update();
-            }
-    
-            $this->dispatch('actualizar', $objeto->id)->to(Fila::class);
+        // Forzar inserción de nuevo registro
+        $this->id = null;
+        $this->validate($this->reglas());
+
+        $modeloString = 'App\\Models\\' . $modelo;
+        $objeto = new $modeloString;
+
+        $this->formularioAlObjeto($modelo, $objeto);
+        $objeto->save();
+
+        $this->dispatch('actualizarMasivo')->to(Tabla::class);
+        $this->dispatch('irALaUltimaPagina')->to(Tabla::class);
+        $this->js("window.dispatchEvent(new CustomEvent('close-insert-modal'))");
+        $this->inicializar($modelo);
+    }
+
+    public function actualizar()
+    {
+        $this->validate($this->reglas($this->id));
+        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'Grado');
+
+        $objeto = $modeloString::withTrashed()->find($this->id);
+        if (!$objeto) {
+            return;
+        }
+
+        $campos = $modeloString::camposModificables();
+        $data = [];
+        foreach ($campos as $campo) {
+            $data[$campo] = ($this->$campo === '' ? null : $this->$campo);
+        }
+
+        $objeto->forceFill($data);
+        $saved = $objeto->save();
+        if ($saved) {
+            $this->dispatch('actualizar')->to(Fila::class);
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+            $this->js("$('#modalDetallesObjeto').modal('hide')");
         }
     }
 
