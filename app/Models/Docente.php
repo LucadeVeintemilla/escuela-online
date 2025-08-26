@@ -61,10 +61,18 @@ class Docente extends Model
     }
 
     public function grado() {
-        return $this->aula->grado();
+        // Siempre devolver una instancia de Relationship
+        if ($this->aula()->exists()) {
+            return $this->aula->grado();
+        }
+        // Dummy relation que no devuelve resultados pero cumple con el contrato
+        return $this->belongsTo(Grado::class, 'grado_id', 'id')->whereRaw('1=0');
     }
 
     public function seccion() {
-        return $this->aula->seccion();
+        if ($this->aula()->exists()) {
+            return $this->aula->seccion();
+        }
+        return $this->belongsTo(Seccion::class, 'seccion_id', 'id')->whereRaw('1=0');
     }
 }

@@ -26,7 +26,6 @@ class FormularioAula extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -101,6 +100,11 @@ class FormularioAula extends Component
             return;
         }
 
+        // Normalizar entradas
+        $this->grado_id = $this->grado_id ? (int) $this->grado_id : null;
+        $this->seccion_id = $this->seccion_id ? (int) $this->seccion_id : null;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
         $campos = $modeloString::camposModificables();
         $data = [];
         foreach ($campos as $campo) {
@@ -110,10 +114,15 @@ class FormularioAula extends Component
         $objeto->forceFill($data);
         $saved = $objeto->save();
         if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
+            }
             $this->dispatch('actualizar')->to(Fila::class);
             $this->dispatch('paginar')->to(Tabla::class);
             $this->dispatch('$refresh');
-            $this->js("$('#modalDetallesObjeto').modal('hide')");
+            // Cerrar modal via browser event
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-aula'))");
         }
     }
 

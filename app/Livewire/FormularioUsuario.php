@@ -28,7 +28,6 @@ class FormularioUsuario extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -98,6 +97,14 @@ class FormularioUsuario extends Component
             return;
         }
 
+        // Normalizar entradas
+        $this->nombre_1   = is_string($this->nombre_1) ? trim($this->nombre_1) : $this->nombre_1;
+        $this->nombre_2   = is_string($this->nombre_2) ? trim($this->nombre_2) : $this->nombre_2;
+        $this->apellido_1 = is_string($this->apellido_1) ? trim($this->apellido_1) : $this->apellido_1;
+        $this->apellido_2 = is_string($this->apellido_2) ? trim($this->apellido_2) : $this->apellido_2;
+        $this->dni        = is_string($this->dni) ? trim($this->dni) : $this->dni;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
         $campos = $modeloString::camposModificables();
         $data = [];
         foreach ($campos as $campo) {
@@ -107,10 +114,15 @@ class FormularioUsuario extends Component
         $objeto->forceFill($data);
         $saved = $objeto->save();
         if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
+            }
             $this->dispatch('actualizar')->to(Fila::class);
             $this->dispatch('paginar')->to(Tabla::class);
             $this->dispatch('$refresh');
-            $this->js("$('#modalDetallesObjeto').modal('hide')");
+            // Cerrar modal y limpiar backdrop desde el front
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-tipo-contenido'))");
         }
     }
 

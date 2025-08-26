@@ -22,7 +22,6 @@ class FormularioSeccion extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -93,6 +92,10 @@ class FormularioSeccion extends Component
             return;
         }
 
+        // Normalizar entradas
+        $this->seccion = is_string($this->seccion) ? trim($this->seccion) : $this->seccion;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
         $campos = $modeloString::camposModificables();
         $data = [];
         foreach ($campos as $campo) {
@@ -102,10 +105,15 @@ class FormularioSeccion extends Component
         $objeto->forceFill($data);
         $saved = $objeto->save();
         if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
+            }
             $this->dispatch('actualizar')->to(Fila::class);
             $this->dispatch('paginar')->to(Tabla::class);
             $this->dispatch('$refresh');
-            $this->js("$('#modalDetallesObjeto').modal('hide')");
+            // Cerrar modal via browser event
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-seccion'))");
         }
     }
 

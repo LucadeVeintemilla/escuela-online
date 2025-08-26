@@ -28,7 +28,6 @@ class FormularioActividad extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -60,7 +59,7 @@ class FormularioActividad extends Component
     protected function reglas(?int $id = null): array
     {
         return [
-            'actividad' => ['required', 'string', 'max:255'],
+            'actividad' => ['required', 'string', 'max:255', Rule::unique('actividads', 'actividad')->ignore($id)->whereNull('deleted_at')],
             'descripcion' => ['nullable', 'string', 'max:255'],
             'inicio' => ['required', 'date'],
             'fin' => ['required', 'date', 'after_or_equal:inicio'],
@@ -97,6 +96,13 @@ class FormularioActividad extends Component
             return;
         }
 
+        // Normalizar entradas
+        $this->actividad   = is_string($this->actividad) ? trim($this->actividad) : $this->actividad;
+        $this->descripcion = is_string($this->descripcion) ? trim($this->descripcion) : $this->descripcion;
+        $this->inicio      = is_string($this->inicio) ? trim($this->inicio) : $this->inicio;
+        $this->fin         = is_string($this->fin) ? trim($this->fin) : $this->fin;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
         $campos = $modeloString::camposModificables();
         $data = [];
         foreach ($campos as $campo) {
@@ -106,10 +112,15 @@ class FormularioActividad extends Component
         $objeto->forceFill($data);
         $saved = $objeto->save();
         if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
+            }
             $this->dispatch('actualizar')->to(Fila::class);
             $this->dispatch('paginar')->to(Tabla::class);
             $this->dispatch('$refresh');
-            $this->js("$('#modalDetallesObjeto').modal('hide')");
+            // Cerrar modal y limpiar backdrop desde el front
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-tipo-contenido'))");
         }
     }
 

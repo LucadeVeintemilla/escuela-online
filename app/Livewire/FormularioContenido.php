@@ -64,7 +64,7 @@ class FormularioContenido extends Component
     protected function reglas(?int $id = null): array
     {
         return [
-            'contenido' => ['required', 'string', 'max:255'],
+            'contenido' => ['required', 'string', 'max:255', Rule::unique('contenidos', 'contenido')->ignore($id)->whereNull('deleted_at')],
             'tipo_contenido_id' => ['required', 'integer', 'exists:tipo_contenidos,id'],
             'usuario_id' => ['required', 'integer', 'exists:usuarios,id'],
             'path' => ['nullable', 'string', 'max:255'],

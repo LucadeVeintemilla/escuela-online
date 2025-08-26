@@ -21,7 +21,6 @@ class FormularioCalificacion extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -100,6 +99,12 @@ class FormularioCalificacion extends Component
             return;
         }
 
+        // Normalizar entradas
+        $this->calificacion = is_string($this->calificacion) ? trim($this->calificacion) : $this->calificacion;
+        $this->abreviatura = is_string($this->abreviatura) ? trim($this->abreviatura) : $this->abreviatura;
+        $this->descripcion = is_string($this->descripcion) ? trim($this->descripcion) : $this->descripcion;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
         $campos = $modeloString::camposModificables();
         $data = [];
         foreach ($campos as $campo) {
@@ -109,10 +114,15 @@ class FormularioCalificacion extends Component
         $objeto->forceFill($data);
         $saved = $objeto->save();
         if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
+            }
             $this->dispatch('actualizar')->to(Fila::class);
             $this->dispatch('paginar')->to(Tabla::class);
             $this->dispatch('$refresh');
-            $this->js("$('#modalDetallesObjeto').modal('hide')");
+            // Cerrar modal via browser event
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-calificacion'))");
         }
     }
 

@@ -28,7 +28,6 @@ class FormularioCalificacionAsignaturaAlumno extends Component
     public $updated_at;
 
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -102,6 +101,12 @@ class FormularioCalificacionAsignaturaAlumno extends Component
             return;
         }
 
+        // Normalizar entradas
+        $this->alumno_id = $this->alumno_id ? (int) $this->alumno_id : null;
+        $this->asignatura_grado_id = $this->asignatura_grado_id ? (int) $this->asignatura_grado_id : null;
+        $this->calificacion_id = $this->calificacion_id ? (int) $this->calificacion_id : null;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
         $campos = $modeloString::camposModificables();
         $data = [];
         foreach ($campos as $campo) {
@@ -111,10 +116,15 @@ class FormularioCalificacionAsignaturaAlumno extends Component
         $objeto->forceFill($data);
         $saved = $objeto->save();
         if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
+            }
             $this->dispatch('actualizar')->to(Fila::class);
             $this->dispatch('paginar')->to(Tabla::class);
             $this->dispatch('$refresh');
-            $this->js("$('#modalDetallesObjeto').modal('hide')");
+            // Cerrar modal via browser event
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-calificacion-asignatura-alumno'))");
         }
     }
 

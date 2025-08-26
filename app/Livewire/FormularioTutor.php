@@ -30,7 +30,6 @@ class FormularioTutor extends Component
 
     //escuchadores
     protected $listeners = [
-        'actualizar',
         'insertar',
         'inicializar',
         'consultar',
@@ -109,18 +108,45 @@ class FormularioTutor extends Component
       }
 
 
-    public function actualizar($modelo, $id)
+    public function actualizar()
     {
-        if ($id == $this->id) {
-            $modeloString = 'App\\Models\\' . $modelo;
-            $objeto = $modeloString::find($id);
-    
-            if ($objeto) {
-                $this->formularioAlObjeto($modelo, $objeto);
-                $objeto->update();
+        $this->validate($this->reglas($this->id));
+        $modeloString = 'App\\Models\\' . ($this->modelo ?? 'Tutor');
+
+        $objeto = $modeloString::withTrashed()->find($this->id);
+        if (!$objeto) {
+            return;
+        }
+
+        // Normalizar entradas
+        $this->nombre_1 = is_string($this->nombre_1) ? trim($this->nombre_1) : $this->nombre_1;
+        $this->nombre_2 = is_string($this->nombre_2) ? trim($this->nombre_2) : $this->nombre_2;
+        $this->apellido_1 = is_string($this->apellido_1) ? trim($this->apellido_1) : $this->apellido_1;
+        $this->apellido_2 = is_string($this->apellido_2) ? trim($this->apellido_2) : $this->apellido_2;
+        $this->dni = is_string($this->dni) ? trim($this->dni) : $this->dni;
+        $this->correo = is_string($this->correo) ? trim($this->correo) : $this->correo;
+        $this->celular = is_string($this->celular) ? trim($this->celular) : $this->celular;
+        $this->genero_id = $this->genero_id ? (int) $this->genero_id : null;
+        $this->observacion = is_string($this->observacion) ? trim($this->observacion) : $this->observacion;
+
+        $campos = $modeloString::camposModificables();
+        $data = [];
+        foreach ($campos as $campo) {
+            $data[$campo] = ($this->$campo === '' ? null : $this->$campo);
+        }
+
+        $objeto->forceFill($data);
+        $saved = $objeto->save();
+        if ($saved) {
+            // Sincronizar propiedades locales tras guardar
+            foreach ($campos as $campo) {
+                $this->$campo = $objeto->$campo;
             }
-    
-            $this->dispatch('actualizar', $objeto->id)->to(Fila::class);
+            $this->dispatch('actualizar')->to(Fila::class);
+            $this->dispatch('paginar')->to(Tabla::class);
+            $this->dispatch('$refresh');
+            // Cerrar modal via evento de navegador
+            $this->js("window.dispatchEvent(new CustomEvent('close-modal-tutor'))");
         }
     }
 
