@@ -19,6 +19,8 @@ class DocenteCalificar extends Component
     public $alumnos = [];
     public $asignaturas = [];
     public array $asignaturasOptions = [];
+    // selección compuesta: "asignatura_grado_id|aula_id"
+    public ?string $seleccion = null;
     public $calificaciones = [];
 
     public ?int $asignatura_grado_id = null;
@@ -53,16 +55,14 @@ class DocenteCalificar extends Component
             ->with('asignatura')
             ->withPivot('aula_id')
             ->orderBy('asignatura_grados.id')
-            ->get()
-            ->unique('id') // evitar duplicados de cursos
-            ->values();
+            ->get();
         // Construir opciones con nombre de aula
         $this->asignaturasOptions = [];
         foreach ($this->asignaturas as $ag) {
             $aula = $ag->pivot->aula_id ? \App\Models\Aula::with(['grado','seccion'])->find($ag->pivot->aula_id) : null;
             $aulaNombre = $aula ? (($aula->grado->grado ?? 'Grado').' - '.($aula->seccion->seccion ?? 'Sección')) : 'Aula no asignada';
             $this->asignaturasOptions[] = [
-                'id' => $ag->id,
+                'id' => $ag->id.'|'.($ag->pivot->aula_id ?? 0),
                 'label' => ($ag->asignatura->asignatura ?? ('Asignatura #'.$ag->id)).' · '.$aulaNombre,
             ];
         }
@@ -75,8 +75,15 @@ class DocenteCalificar extends Component
         // Pre-cargar notas existentes si hay una asignatura seleccionada más adelante
     }
 
-    public function updatedAsignaturaGradoId($value): void
+    public function updatedSeleccion($value): void
     {
+        // Espera formato "agid|aulaid"
+        $this->asignatura_grado_id = null;
+        $this->aula_id = null;
+        if (!$value) { $this->alumnos = []; return; }
+        [$agId, $aulaId] = array_pad(explode('|', (string)$value), 2, null);
+        $this->asignatura_grado_id = $agId ? (int)$agId : null;
+        $this->aula_id = $aulaId ? (int)$aulaId : null;
         $this->cargarContextoAulaYAlumnos();
         $this->cargarNotasExistentes();
     }
@@ -105,12 +112,6 @@ class DocenteCalificar extends Component
         $this->alumnos = [];
 
         if (!$this->asignatura_grado_id) return;
-
-        // Buscar la asignatura seleccionada dentro de la colección con su pivot
-        $ag = $this->asignaturas->firstWhere('id', (int)$this->asignatura_grado_id);
-        if (!$ag) return;
-
-        $this->aula_id = $ag->pivot->aula_id ?? null;
         if (!$this->aula_id) {
             $this->mensaje = 'La asignatura seleccionada no tiene un aula asociada en la asignación. Pida al admin que la configure.';
             return;

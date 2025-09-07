@@ -1,3 +1,5 @@
+@php $rol = optional(auth()->user()->role)->rol ?? null; @endphp
+@if($rol === 'Docente')
 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
   <li class="nav-item">
     <a href="{{ route('docente.dashboard') }}" class="nav-link {{ request()->routeIs('docente.dashboard') ? 'active' : '' }}">
@@ -25,3 +27,4 @@
     </a>
   </li> --}}
 </ul>
+@endif

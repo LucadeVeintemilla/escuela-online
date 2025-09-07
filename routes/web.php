@@ -34,9 +34,17 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+// Logout route (POST)
+Route::post('logout', function() {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->middleware(['auth'])->name('logout');
+
 // Docente dashboard (solo usuarios con rol Docente)
 Route::middleware(['auth', 'verified', 'role:Docente'])->group(function () {
-    Route::view('docente', 'livewire.paneles-docencia')->name('docente.dashboard');
+    Route::redirect('docente', 'docente/cursos')->name('docente.dashboard');
     Route::view('docente/calificar', 'livewire.docente.calificar-page')->name('docente.calificar');
     Route::view('docente/cursos', 'livewire.docente.cursos-page')->name('docente.cursos');
     Route::view('docente/actividades', 'livewire.docente.actividades-page')->name('docente.actividades');

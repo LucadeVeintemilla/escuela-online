@@ -15,7 +15,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Asignatura</label>
-                            <select class="form-control" wire:model.change="asignatura_grado_id">
+                            <select class="form-control" wire:model.change="seleccion">
                                 <option value="">-- Seleccionar --</option>
                                 @foreach ($asignaturasOptions as $opt)
                                     <option value="{{ $opt['id'] }}">{{ $opt['label'] }}</option>
