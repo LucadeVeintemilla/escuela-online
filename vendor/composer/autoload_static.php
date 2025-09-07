@@ -19,20 +19,21 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
         '35a6ad97d21e794e7e22a17d806652e4' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Functions.php',
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        '3bd81c9b8fcc150b69d8b63b4d2ccf23' => __DIR__ . '/..' . '/spatie/flare-client-php/src/helpers.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
-        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
-        '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '3bd81c9b8fcc150b69d8b63b4d2ccf23' => __DIR__ . '/..' . '/spatie/flare-client-php/src/helpers.php',
         '265b4faa2b3a9766332744949e83bf97' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/helpers.php',
         'c7a3c339e7e14b60e06a2d7fcce9476b' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/functions.php',
         'f57d353b41eb2e234b26064d63d8c5dd' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Filesystem/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         '40275907c8566c390185147049ef6e5d' => __DIR__ . '/..' . '/livewire/livewire/src/helpers.php',
+        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'b0b808d855d8f6fc568ca07586cb55de' => __DIR__ . '/..' . '/livewire/volt/functions.php',
         'c72349b1fe8d0deeedd3a52e8aa814d8' => __DIR__ . '/..' . '/mockery/mockery/library/helpers.php',
         'ce9671a430e4846b44e1c68c7611f9f5' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'a1cfe24d14977df6878b9bf804af2d1c' => __DIR__ . '/..' . '/nunomaduro/collision/src/Adapters/Phpunit/Autoload.php',
@@ -121,6 +122,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         ),
         'L' => 
         array (
+            'Livewire\\Volt\\' => 14,
             'Livewire\\' => 9,
             'League\\MimeTypeDetection\\' => 25,
             'League\\Flysystem\\Local\\' => 23,
@@ -131,6 +133,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
             'Laravel\\SerializableClosure\\' => 28,
             'Laravel\\Sail\\' => 13,
             'Laravel\\Prompts\\' => 16,
+            'Laravel\\Breeze\\' => 15,
         ),
         'I' => 
         array (
@@ -396,6 +399,10 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         array (
             0 => __DIR__ . '/..' . '/mockery/mockery/library/Mockery',
         ),
+        'Livewire\\Volt\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/livewire/volt/src',
+        ),
         'Livewire\\' => 
         array (
             0 => __DIR__ . '/..' . '/livewire/livewire/src',
@@ -435,6 +442,10 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'Laravel\\Prompts\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/prompts/src',
+        ),
+        'Laravel\\Breeze\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laravel/breeze/src',
         ),
         'Illuminate\\Support\\' => 
         array (
@@ -531,6 +542,16 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'R' => 
+        array (
+            'Rap2hpoutre\\LaravelLogViewer\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
@@ -554,8 +575,10 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'App\\Livewire\\FormularioActividad' => __DIR__ . '/../..' . '/app/Livewire/FormularioActividad.php',
         'App\\Livewire\\FormularioAlumno' => __DIR__ . '/../..' . '/app/Livewire/FormularioAlumno.php',
         'App\\Livewire\\FormularioAsignatura' => __DIR__ . '/../..' . '/app/Livewire/FormularioAsignatura.php',
+        'App\\Livewire\\FormularioAsignaturaGrado' => __DIR__ . '/../..' . '/app/Livewire/FormularioAsignaturaGrado.php',
         'App\\Livewire\\FormularioAula' => __DIR__ . '/../..' . '/app/Livewire/FormularioAula.php',
         'App\\Livewire\\FormularioCalificacion' => __DIR__ . '/../..' . '/app/Livewire/FormularioCalificacion.php',
+        'App\\Livewire\\FormularioCalificacionAsignaturaAlumno' => __DIR__ . '/../..' . '/app/Livewire/FormularioCalificacionAsignaturaAlumno.php',
         'App\\Livewire\\FormularioContenido' => __DIR__ . '/../..' . '/app/Livewire/FormularioContenido.php',
         'App\\Livewire\\FormularioDirectivo' => __DIR__ . '/../..' . '/app/Livewire/FormularioDirectivo.php',
         'App\\Livewire\\FormularioDocente' => __DIR__ . '/../..' . '/app/Livewire/FormularioDocente.php',
@@ -2853,6 +2876,12 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'Illuminate\\View\\ViewFinderInterface' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
+        'Laravel\\Breeze\\BreezeServiceProvider' => __DIR__ . '/..' . '/laravel/breeze/src/BreezeServiceProvider.php',
+        'Laravel\\Breeze\\Console\\InstallCommand' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallCommand.php',
+        'Laravel\\Breeze\\Console\\InstallsApiStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsApiStack.php',
+        'Laravel\\Breeze\\Console\\InstallsBladeStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsBladeStack.php',
+        'Laravel\\Breeze\\Console\\InstallsInertiaStacks' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsInertiaStacks.php',
+        'Laravel\\Breeze\\Console\\InstallsLivewireStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsLivewireStack.php',
         'Laravel\\Prompts\\Concerns\\Colors' => __DIR__ . '/..' . '/laravel/prompts/src/Concerns/Colors.php',
         'Laravel\\Prompts\\Concerns\\Cursor' => __DIR__ . '/..' . '/laravel/prompts/src/Concerns/Cursor.php',
         'Laravel\\Prompts\\Concerns\\Erase' => __DIR__ . '/..' . '/laravel/prompts/src/Concerns/Erase.php',
@@ -3514,6 +3543,68 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'Livewire\\Mechanisms\\RenderComponent' => __DIR__ . '/..' . '/livewire/livewire/src/Mechanisms/RenderComponent.php',
         'Livewire\\Pipe' => __DIR__ . '/..' . '/livewire/livewire/src/Pipe.php',
         'Livewire\\Transparency' => __DIR__ . '/..' . '/livewire/livewire/src/Transparency.php',
+        'Livewire\\Volt\\Actions\\CallHook' => __DIR__ . '/..' . '/livewire/volt/src/Actions/CallHook.php',
+        'Livewire\\Volt\\Actions\\CallListener' => __DIR__ . '/..' . '/livewire/volt/src/Actions/CallListener.php',
+        'Livewire\\Volt\\Actions\\CallMethod' => __DIR__ . '/..' . '/livewire/volt/src/Actions/CallMethod.php',
+        'Livewire\\Volt\\Actions\\CallPropertyHook' => __DIR__ . '/..' . '/livewire/volt/src/Actions/CallPropertyHook.php',
+        'Livewire\\Volt\\Actions\\InitializeState' => __DIR__ . '/..' . '/livewire/volt/src/Actions/InitializeState.php',
+        'Livewire\\Volt\\Actions\\ResolveListeners' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ResolveListeners.php',
+        'Livewire\\Volt\\Actions\\ReturnLayout' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnLayout.php',
+        'Livewire\\Volt\\Actions\\ReturnPaginationTheme' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnPaginationTheme.php',
+        'Livewire\\Volt\\Actions\\ReturnPaginationView' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnPaginationView.php',
+        'Livewire\\Volt\\Actions\\ReturnPlaceholder' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnPlaceholder.php',
+        'Livewire\\Volt\\Actions\\ReturnRules' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnRules.php',
+        'Livewire\\Volt\\Actions\\ReturnTitle' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnTitle.php',
+        'Livewire\\Volt\\Actions\\ReturnValidationAttributes' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnValidationAttributes.php',
+        'Livewire\\Volt\\Actions\\ReturnValidationMessages' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnValidationMessages.php',
+        'Livewire\\Volt\\Actions\\ReturnViewData' => __DIR__ . '/..' . '/livewire/volt/src/Actions/ReturnViewData.php',
+        'Livewire\\Volt\\CompileContext' => __DIR__ . '/..' . '/livewire/volt/src/CompileContext.php',
+        'Livewire\\Volt\\CompiledComponentFile' => __DIR__ . '/..' . '/livewire/volt/src/CompiledComponentFile.php',
+        'Livewire\\Volt\\Compiler' => __DIR__ . '/..' . '/livewire/volt/src/Compiler.php',
+        'Livewire\\Volt\\CompilerVersion' => __DIR__ . '/..' . '/livewire/volt/src/CompilerVersion.php',
+        'Livewire\\Volt\\Compilers\\Interfaces' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/Interfaces.php',
+        'Livewire\\Volt\\Compilers\\Mount' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/Mount.php',
+        'Livewire\\Volt\\Compilers\\ProtectedMethods' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/ProtectedMethods.php',
+        'Livewire\\Volt\\Compilers\\ProtectedProperties' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/ProtectedProperties.php',
+        'Livewire\\Volt\\Compilers\\PublicMethods' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/PublicMethods.php',
+        'Livewire\\Volt\\Compilers\\PublicProperties' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/PublicProperties.php',
+        'Livewire\\Volt\\Compilers\\Traits' => __DIR__ . '/..' . '/livewire/volt/src/Compilers/Traits.php',
+        'Livewire\\Volt\\Component' => __DIR__ . '/..' . '/livewire/volt/src/Component.php',
+        'Livewire\\Volt\\ComponentFactory' => __DIR__ . '/..' . '/livewire/volt/src/ComponentFactory.php',
+        'Livewire\\Volt\\ComponentResolver' => __DIR__ . '/..' . '/livewire/volt/src/ComponentResolver.php',
+        'Livewire\\Volt\\Console\\InstallCommand' => __DIR__ . '/..' . '/livewire/volt/src/Console/InstallCommand.php',
+        'Livewire\\Volt\\Console\\MakeCommand' => __DIR__ . '/..' . '/livewire/volt/src/Console/MakeCommand.php',
+        'Livewire\\Volt\\Contracts\\Action' => __DIR__ . '/..' . '/livewire/volt/src/Contracts/Action.php',
+        'Livewire\\Volt\\Contracts\\Compiler' => __DIR__ . '/..' . '/livewire/volt/src/Contracts/Compiler.php',
+        'Livewire\\Volt\\Contracts\\FunctionalComponent' => __DIR__ . '/..' . '/livewire/volt/src/Contracts/FunctionalComponent.php',
+        'Livewire\\Volt\\Exceptions\\ReturnNewClassExecutionEndingException' => __DIR__ . '/..' . '/livewire/volt/src/Exceptions/ReturnNewClassExecutionEndingException.php',
+        'Livewire\\Volt\\Exceptions\\SignatureMismatchException' => __DIR__ . '/..' . '/livewire/volt/src/Exceptions/SignatureMismatchException.php',
+        'Livewire\\Volt\\Exceptions\\TraitOrInterfaceNotFound' => __DIR__ . '/..' . '/livewire/volt/src/Exceptions/TraitOrInterfaceNotFound.php',
+        'Livewire\\Volt\\Exceptions\\VoltDirectiveMissingException' => __DIR__ . '/..' . '/livewire/volt/src/Exceptions/VoltDirectiveMissingException.php',
+        'Livewire\\Volt\\ExtractedFragment' => __DIR__ . '/..' . '/livewire/volt/src/ExtractedFragment.php',
+        'Livewire\\Volt\\FragmentAlias' => __DIR__ . '/..' . '/livewire/volt/src/FragmentAlias.php',
+        'Livewire\\Volt\\FragmentMap' => __DIR__ . '/..' . '/livewire/volt/src/FragmentMap.php',
+        'Livewire\\Volt\\InlineListenerName' => __DIR__ . '/..' . '/livewire/volt/src/InlineListenerName.php',
+        'Livewire\\Volt\\LivewireManager' => __DIR__ . '/..' . '/livewire/volt/src/LivewireManager.php',
+        'Livewire\\Volt\\Methods\\ActionMethod' => __DIR__ . '/..' . '/livewire/volt/src/Methods/ActionMethod.php',
+        'Livewire\\Volt\\Methods\\ComputedMethod' => __DIR__ . '/..' . '/livewire/volt/src/Methods/ComputedMethod.php',
+        'Livewire\\Volt\\Methods\\JsMethod' => __DIR__ . '/..' . '/livewire/volt/src/Methods/JsMethod.php',
+        'Livewire\\Volt\\Methods\\Method' => __DIR__ . '/..' . '/livewire/volt/src/Methods/Method.php',
+        'Livewire\\Volt\\Methods\\ProtectedMethod' => __DIR__ . '/..' . '/livewire/volt/src/Methods/ProtectedMethod.php',
+        'Livewire\\Volt\\Methods\\ReflectionMethod' => __DIR__ . '/..' . '/livewire/volt/src/Methods/ReflectionMethod.php',
+        'Livewire\\Volt\\MountedDirectories' => __DIR__ . '/..' . '/livewire/volt/src/MountedDirectories.php',
+        'Livewire\\Volt\\MountedDirectory' => __DIR__ . '/..' . '/livewire/volt/src/MountedDirectory.php',
+        'Livewire\\Volt\\Options\\RuleOptions' => __DIR__ . '/..' . '/livewire/volt/src/Options/RuleOptions.php',
+        'Livewire\\Volt\\Options\\StateOptions' => __DIR__ . '/..' . '/livewire/volt/src/Options/StateOptions.php',
+        'Livewire\\Volt\\Options\\UsesOptions' => __DIR__ . '/..' . '/livewire/volt/src/Options/UsesOptions.php',
+        'Livewire\\Volt\\Precompilers\\Concerns\\ExtractsImports' => __DIR__ . '/..' . '/livewire/volt/src/Precompilers/Concerns/ExtractsImports.php',
+        'Livewire\\Volt\\Precompilers\\ExtractFragments' => __DIR__ . '/..' . '/livewire/volt/src/Precompilers/ExtractFragments.php',
+        'Livewire\\Volt\\Precompilers\\ExtractTemplate' => __DIR__ . '/..' . '/livewire/volt/src/Precompilers/ExtractTemplate.php',
+        'Livewire\\Volt\\Property' => __DIR__ . '/..' . '/livewire/volt/src/Property.php',
+        'Livewire\\Volt\\Support\\Reflection' => __DIR__ . '/..' . '/livewire/volt/src/Support/Reflection.php',
+        'Livewire\\Volt\\Volt' => __DIR__ . '/..' . '/livewire/volt/src/Volt.php',
+        'Livewire\\Volt\\VoltManager' => __DIR__ . '/..' . '/livewire/volt/src/VoltManager.php',
+        'Livewire\\Volt\\VoltServiceProvider' => __DIR__ . '/..' . '/livewire/volt/src/VoltServiceProvider.php',
         'Livewire\\WireDirective' => __DIR__ . '/..' . '/livewire/livewire/src/WireDirective.php',
         'Livewire\\Wireable' => __DIR__ . '/..' . '/livewire/livewire/src/Wireable.php',
         'Livewire\\WithFileUploads' => __DIR__ . '/..' . '/livewire/livewire/src/WithFileUploads.php',
@@ -5412,6 +5503,12 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         'Ramsey\\Uuid\\UuidInterface' => __DIR__ . '/..' . '/ramsey/uuid/src/UuidInterface.php',
         'Ramsey\\Uuid\\Validator\\GenericValidator' => __DIR__ . '/..' . '/ramsey/uuid/src/Validator/GenericValidator.php',
         'Ramsey\\Uuid\\Validator\\ValidatorInterface' => __DIR__ . '/..' . '/ramsey/uuid/src/Validator/ValidatorInterface.php',
+        'Rap2hpoutre\\LaravelLogViewer\\BaseController' => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src/controllers/LogViewerController.php',
+        'Rap2hpoutre\\LaravelLogViewer\\LaravelLogViewer' => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src/Rap2hpoutre/LaravelLogViewer/LaravelLogViewer.php',
+        'Rap2hpoutre\\LaravelLogViewer\\LaravelLogViewerServiceProvider' => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src/Rap2hpoutre/LaravelLogViewer/LaravelLogViewerServiceProvider.php',
+        'Rap2hpoutre\\LaravelLogViewer\\Level' => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src/Rap2hpoutre/LaravelLogViewer/Level.php',
+        'Rap2hpoutre\\LaravelLogViewer\\LogViewerController' => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src/controllers/LogViewerController.php',
+        'Rap2hpoutre\\LaravelLogViewer\\Pattern' => __DIR__ . '/..' . '/rap2hpoutre/laravel-log-viewer/src/Rap2hpoutre/LaravelLogViewer/Pattern.php',
         'SQLite3Exception' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',
         'SebastianBergmann\\CliParser\\AmbiguousOptionException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/AmbiguousOptionException.php',
         'SebastianBergmann\\CliParser\\Exception' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/Exception.php',
@@ -6903,6 +7000,7 @@ class ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitbfe12996eeecb6fdc8713a9fd9d431f8::$classMap;
 
         }, null, ClassLoader::class);

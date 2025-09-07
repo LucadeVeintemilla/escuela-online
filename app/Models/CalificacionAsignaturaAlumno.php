@@ -12,6 +12,13 @@ class CalificacionAsignaturaAlumno extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'alumno_id',
+        'asignatura_grado_id',
+        'calificacion_id',
+        'observacion',
+    ];
+
     static public function vistaCampos(){
         return [
             'principales' => [

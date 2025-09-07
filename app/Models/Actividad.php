@@ -12,6 +12,18 @@ class Actividad extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'actividad',
+        'descripcion',
+        'inicio',
+        'fin',
+        'usuario_id',
+        'observacion',
+        'docente_id',
+        'aula_id',
+        'asignatura_grado_id',
+    ];
+
     static public function camposTabla(){
         return [
             ['ID', 'at', ['id']],
@@ -45,4 +57,15 @@ class Actividad extends Model
         return $this->belongsTo(Usuario::class);
     }
 
+    public function docente(): BelongsTo {
+        return $this->belongsTo(Docente::class);
+    }
+
+    public function aula(): BelongsTo {
+        return $this->belongsTo(Aula::class);
+    }
+
+    public function asignaturaGrado(): BelongsTo {
+        return $this->belongsTo(AsignaturaGrado::class);
+    }
 }

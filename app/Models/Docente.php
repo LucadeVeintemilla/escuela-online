@@ -5,12 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Docente extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'nombre_1','nombre_2','apellido_1','apellido_2','dni','genero_id','observacion','correo','celular','aula_id','activo','user_id'
+    ];
 
     static public function camposTabla(){
         return [
@@ -74,5 +79,17 @@ class Docente extends Model
             return $this->aula->seccion();
         }
         return $this->belongsTo(Seccion::class, 'seccion_id', 'id')->whereRaw('1=0');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function asignaturasGrado(): BelongsToMany
+    {
+        return $this->belongsToMany(AsignaturaGrado::class, 'docente_asignatura_grado')
+            ->withPivot('aula_id')
+            ->withTimestamps();
     }
 }

@@ -145,6 +145,26 @@
                 'pagina' => 1, 
                 'objetosPagina' => 5])
         @break
+
+        @case('18')
+            {{-- Admin: Asignar Docente a Aula dentro del SPA --}}
+            @livewire('admin-asignar-docente-aula')
+        @break
+
+        @case('19')
+            {{-- Admin: Asignar Alumnos a Aula dentro del SPA --}}
+            @livewire('admin-asignar-alumnos-aula')
+        @break
+
+        @case('20')
+            {{-- Admin: Asignar Materias a Docente dentro del SPA --}}
+            @livewire('admin-asignar-materias-docente')
+        @break
+
+        @case('21')
+            {{-- Admin: Actividades Curriculares (docente + asignatura_grado + aula) --}}
+            @livewire('admin-actividades-curriculares')
+        @break
         
         @default
             {{--  --}}

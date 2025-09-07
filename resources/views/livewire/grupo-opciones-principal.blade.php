@@ -49,23 +49,44 @@
              ['tituloOpcion' => 'Aulas',
              'iconoOpcion' => 'person-workspace', 
              'tituloAreaTrabajo' => 'Área de Aulas', 
-             'codigoAreaTrabajo' => '06']]]
+             'codigoAreaTrabajo' => '06'],
+
+             // Paneles de asignación separados
+            ['tituloOpcion' => 'Asignar Docente a Aula',
+             'iconoOpcion' => 'person-plus',
+             'tituloAreaTrabajo' => 'Área de Asignar Docente a Aula',
+             'codigoAreaTrabajo' => '18'],
+
+            ['tituloOpcion' => 'Asignar Alumnos a Aula',
+             'iconoOpcion' => 'people',
+             'tituloAreaTrabajo' => 'Área de Asignar Alumnos a Aula',
+             'codigoAreaTrabajo' => '19'],
+
+            ['tituloOpcion' => 'Asignar Materias a Docente',
+             'iconoOpcion' => 'journal-check',
+             'tituloAreaTrabajo' => 'Área de Asignar Materias a Docente',
+             'codigoAreaTrabajo' => '20']
+            ]]
     )
 
+    {{-- Enlaces directos adicionales dentro de Estructura escolar --}}
     
     @livewire('Submenu', 
         ['tituloSubmenu' => 'Estructura curricular', 
         'iconoSubmenu' => 'backpack2', 
         'opcionesSubmenu' => [
             ['tituloOpcion' => 'Asignaturas',
-             'iconoOpcion' => 'journal-bookmark-fill', 
+             'iconoOpcion' => 'book', 
              'tituloAreaTrabajo' => 'Área de Asignaturas', 
-             'codigoAreaTrabajo' => '07'], 
-
+             'codigoAreaTrabajo' => '07'],
             ['tituloOpcion' => 'Cursos',
-             'iconoOpcion' => 'journal-bookmark', 
+             'iconoOpcion' => 'journals', 
              'tituloAreaTrabajo' => 'Área de Cursos', 
              'codigoAreaTrabajo' => '08'],
+            ['tituloOpcion' => 'Actividades (Curricular)',
+             'iconoOpcion' => 'clipboard2-check',
+             'tituloAreaTrabajo' => 'Área de Actividades Curriculares',
+             'codigoAreaTrabajo' => '21'],
              
              ['tituloOpcion' => 'Tipos de calific.',
              'iconoOpcion' => 'filetype-aac', 

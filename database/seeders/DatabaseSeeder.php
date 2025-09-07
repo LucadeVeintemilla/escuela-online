@@ -8,12 +8,15 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Roles and default admin first
+        $this->call(RolSeeder::class);
+        $this->call(AdminUserSeeder::class);
+
         $this->call(GradoSeeder::class);
         $this->call(AsignaturaSeeder::class);
         $this->call(AsignaturaGradoSeeder::class);
         $this->call(SeccionSeeder::class);
         $this->call(AulaSeeder::class);
-        // $this->call(RolSeeder::class);
         $this->call(GeneroSeeder::class);
         $this->call(UsuarioSeeder::class);
         $this->call(ContactoSeeder::class);

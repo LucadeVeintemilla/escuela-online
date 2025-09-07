@@ -1,103 +1,23 @@
-<section class="content">
-    <div class="container-fluid">
-        <div class="card card-default">
-            {{-- cabecera --}}
-            <div class="card-header">
-                <h3 class="card-title"> Docencia </h3>
-
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-
-            {{-- cuerpo --}}
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-2 col-6">
-                        <!-- small box -->
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>6</h3>
-
-                                <p>Directivos</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-bag"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-6">
-                        <!-- small box -->
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>30</h3>
-
-                                <p>Docentes</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-bag"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-6">
-                        <!-- small box -->
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>20</h3>
-
-                                <p>Aulas</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-bag"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-6">
-                        <!-- small box -->
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>150</h3>
-
-                                <p>Alumnos</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-bag"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-6">
-                        <!-- small box -->
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>500</h3>
-
-                                <p>Tutores</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-bag"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- footer --}}
-            {{-- <div class="card-footer">
-                <div class="d-flex flex-wrap justify-content-center align-items-center">
-                    footer                    
-                </div>
-            </div> --}}
+@extends('layouts.adminlte_with_sidebar')
+@section('title', 'Docencia')
+@section('sidebar')
+  @include('livewire.docente.sidebar')
+@endsection
+@section('content')
+<section class="content pt-3">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">Docencia</h3>
+        <div class="card-tools">
+          <a href="{{ route('docente.cursos') }}" class="btn btn-sm btn-primary mr-2">Mis Cursos</a>
+          <a href="{{ route('docente.calificar') }}" class="btn btn-sm btn-outline-primary">Calificar</a>
         </div>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-0">Usa el menú lateral (hamburguesa) para navegar entre secciones del docente.</p>
+      </div>
     </div>
+  </div>
 </section>
+@endsection

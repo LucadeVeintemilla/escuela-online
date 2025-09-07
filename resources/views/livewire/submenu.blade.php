@@ -12,8 +12,9 @@
                 @livewire('OpcionSubmenu',
                     ['tituloOpcion' => $opcion['tituloOpcion'],
                     'iconoOpcion' => $opcion['iconoOpcion'], 
-                    'tituloAreaTrabajo' => $opcion['tituloAreaTrabajo'],
-                    'codigoAreaTrabajo' => $opcion['codigoAreaTrabajo']],
+                    'tituloAreaTrabajo' => $opcion['tituloAreaTrabajo'] ?? null,
+                    'codigoAreaTrabajo' => $opcion['codigoAreaTrabajo'] ?? null,
+                    'route' => $opcion['route'] ?? null],
                      
                     key('opcion' . $tituloSubmenu . $loop->index))
             @endforeach
