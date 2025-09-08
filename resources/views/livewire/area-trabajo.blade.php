@@ -11,7 +11,20 @@
 
     @switch($codigoAreaTrabajo)
         @case('00')
-            @livewire('PanelesDocencia')
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-primary">
+                                <div class="card-header"><h3 class="card-title mb-0">Cuadros de Mando</h3></div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-0">Bienvenido al panel de administración. Selecciona una opción del menú para ver métricas y resúmenes.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         @break
         
         @case('01')

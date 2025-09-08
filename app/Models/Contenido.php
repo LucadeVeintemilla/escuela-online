@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo as EloquentBelongsTo;
 
 class Contenido extends Model
 {
@@ -45,5 +46,14 @@ class Contenido extends Model
 
     public function tipoContenido(): BelongsTo {
         return $this->belongsTo(related: TipoContenido::class);
+    }
+
+    // Nuevas relaciones
+    public function actividad(): EloquentBelongsTo {
+        return $this->belongsTo(Actividad::class);
+    }
+
+    public function alumno(): EloquentBelongsTo {
+        return $this->belongsTo(Alumno::class);
     }
 }

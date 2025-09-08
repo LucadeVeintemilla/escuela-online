@@ -9,6 +9,7 @@ use App\Models\Docente;
 use App\Models\Actividad;
 use App\Models\Calificacion;
 use App\Models\Alumno;
+use App\Models\Contenido;
 
 class DocenteCalificarActividad extends Component
 {
@@ -17,6 +18,8 @@ class DocenteCalificarActividad extends Component
 
     public array $alumnos = [];
     public array $calificaciones = [];
+    public array $recursosPorAlumno = [];
+    public array $ultimoRecursoPorAlumno = [];
 
     // [alumno_id => calificacion_id]
     public array $notas = [];
@@ -53,6 +56,8 @@ class DocenteCalificarActividad extends Component
 
         $this->notas = [];
         $this->observaciones = [];
+        $this->recursosPorAlumno = [];
+        $this->ultimoRecursoPorAlumno = [];
         if (empty($this->alumnos)) return;
 
         $ids = array_map(fn($a) => $a['id'], $this->alumnos);
@@ -63,6 +68,29 @@ class DocenteCalificarActividad extends Component
         foreach ($existentes as $row) {
             $this->notas[$row->alumno_id] = $row->calificacion_id;
             $this->observaciones[$row->alumno_id] = $row->observacion;
+        }
+
+        // Cargar recursos subidos por los alumnos para esta actividad
+        $contenidos = Contenido::where('actividad_id', $this->actividad->id)
+            ->whereIn('alumno_id', $ids)
+            ->orderByDesc('id')
+            ->get(['id','alumno_id','contenido','path','created_at']);
+        foreach ($contenidos as $c) {
+            $this->recursosPorAlumno[$c->alumno_id][] = [
+                'id' => $c->id,
+                'nombre' => $c->contenido,
+                'url' => ($c->path ? (\Storage::disk('public')->url($c->path)) : null),
+                'fecha' => $c->created_at,
+            ];
+            // Guardar el más reciente como acceso rápido
+            if (!isset($this->ultimoRecursoPorAlumno[$c->alumno_id])) {
+                $this->ultimoRecursoPorAlumno[$c->alumno_id] = [
+                    'id' => $c->id,
+                    'nombre' => $c->contenido,
+                    'url' => ($c->path ? (\Storage::disk('public')->url($c->path)) : null),
+                    'fecha' => $c->created_at,
+                ];
+            }
         }
     }
 

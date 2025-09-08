@@ -26,6 +26,9 @@ Route::get('dashboard', function () {
     if ($role === 'Docente') {
         return redirect()->route('docente.dashboard');
     }
+    if ($role === 'Alumno') {
+        return redirect()->route('alumno.actividades');
+    }
     // Default to Admin main panel
     return redirect()->route('app');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -52,13 +55,26 @@ Route::middleware(['auth', 'verified', 'role:Docente'])->group(function () {
 });
 
 // Admin main panel (legacy forms) at /app
-Route::view('app', 'components.layouts.app')
-    ->middleware(['auth', 'verified', 'role:Admin'])
-    ->name('app');
+Route::get('app', function () {
+    $user = Auth::user();
+    if (!$user) { return redirect()->route('login'); }
+    $role = optional($user->role)->rol;
+    if ($role === 'Admin') {
+        return view('components.layouts.app');
+    }
+    // Para otros roles, redirigir a su dashboard unificado
+    return redirect()->route('dashboard');
+})->middleware(['auth', 'verified'])->name('app');
 
 // Admin: asignaciones de docente (aula y materias)
 Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
     Route::get('admin/asignaciones', \App\Livewire\AdminAsignaciones::class)->name('admin.asignaciones');
+});
+
+// Alumno (perfil estudiante)
+Route::middleware(['auth', 'verified', 'role:Alumno'])->group(function () {
+    Route::view('alumno/actividades', 'livewire.alumno.actividades-page')->name('alumno.actividades');
+    Route::view('alumno/actividad', 'livewire.alumno.actividad-page')->name('alumno.actividad');
 });
 
 require __DIR__.'/auth.php';
