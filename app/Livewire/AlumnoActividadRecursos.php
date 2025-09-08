@@ -20,6 +20,7 @@ class AlumnoActividadRecursos extends Component
 
     public array $recursos = [];
     public string $mensaje = '';
+    public bool $disponible = true;
 
     // Upload inputs
     public $archivo; // Livewire temporary file
@@ -48,7 +49,21 @@ class AlumnoActividadRecursos extends Component
         if ($this->actividad->aula_id !== $this->alumno->aula_id) { $this->mensaje = 'No tienes acceso a esta actividad.'; Log::warning('Aula mismatch', ['actividad_aula' => $this->actividad->aula_id, 'alumno_aula' => $this->alumno->aula_id]); return; }
 
         $this->cargarRecursos();
+        $this->actualizarDisponibilidad();
         $this->dispatch('debug', ['where' => 'mount', 'actividad_id' => $this->actividad->id, 'alumno_id' => $this->alumno->id]);
+    }
+
+    protected function actualizarDisponibilidad(): void
+    {
+        if (!$this->actividad) { $this->disponible = false; return; }
+        $now = now();
+        $this->disponible = !(
+            ($this->actividad->inicio && $now->lt($this->actividad->inicio)) ||
+            ($this->actividad->fin && $now->gt($this->actividad->fin))
+        );
+        if (!$this->disponible && empty($this->mensaje)) {
+            $this->mensaje = 'La actividad no está disponible para subir recursos en este momento.';
+        }
     }
 
     protected function cargarRecursos(): void
@@ -73,9 +88,9 @@ class AlumnoActividadRecursos extends Component
         $this->dispatch('debug', ['where' => 'subir:called']);
         $this->validate();
         if (!$this->actividad || !$this->alumno) { Log::warning('Missing actividad or alumno'); return; }
-        $now = now();
-        if (($this->actividad->inicio && $now->lt($this->actividad->inicio)) || ($this->actividad->fin && $now->gt($this->actividad->fin))) {
-            $this->mensaje = 'La actividad no está disponible para subir recursos en este momento.';
+        $this->actualizarDisponibilidad();
+        if (!$this->disponible) {
+            $now = now();
             $this->dispatch('debug', ['where' => 'subir:blocked_by_window', 'inicio' => (string)$this->actividad->inicio, 'fin' => (string)$this->actividad->fin, 'now' => (string)$now]);
             Log::info('Upload blocked by availability window', ['inicio' => (string)$this->actividad->inicio, 'fin' => (string)$this->actividad->fin, 'now' => (string)$now]);
             return;

@@ -5,4 +5,10 @@
       <p>Mis Actividades</p>
     </a>
   </li>
+  <li class="nav-item">
+    <a href="{{ route('alumno.mi-aula') }}" class="nav-link {{ request()->routeIs('alumno.mi-aula') ? 'active' : '' }}">
+      <i class="nav-icon fas fa-school"></i>
+      <p>Mi Grado y Sección</p>
+    </a>
+  </li>
 </ul>

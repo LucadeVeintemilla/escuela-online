@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified', 'role:Docente'])->group(function () {
     Route::redirect('docente', 'docente/cursos')->name('docente.dashboard');
     Route::view('docente/calificar', 'livewire.docente.calificar-page')->name('docente.calificar');
     Route::view('docente/cursos', 'livewire.docente.cursos-page')->name('docente.cursos');
+    Route::view('docente/reportes', 'livewire.docente.reportes-page')->name('docente.reportes');
     Route::view('docente/actividades', 'livewire.docente.actividades-page')->name('docente.actividades');
     Route::view('docente/actividad/calificar', 'livewire.docente.calificar-actividad-page')->name('docente.actividad.calificar');
 });
@@ -75,6 +76,7 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:Alumno'])->group(function () {
     Route::view('alumno/actividades', 'livewire.alumno.actividades-page')->name('alumno.actividades');
     Route::view('alumno/actividad', 'livewire.alumno.actividad-page')->name('alumno.actividad');
+    Route::view('alumno/mi-aula', 'livewire.alumno.mi-aula-page')->name('alumno.mi-aula');
 });
 
 require __DIR__.'/auth.php';

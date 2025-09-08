@@ -8,18 +8,21 @@
         @if ($mensaje)
           <div class="alert alert-warning">{{ $mensaje }}</div>
         @else
+          @if (!$disponible)
+            <div class="alert alert-info">Esta actividad no está disponible para subir recursos en este momento.</div>
+          @endif
           <form wire:submit.prevent="subir">
             <div class="mb-3">
               <label class="form-label">Título (opcional)</label>
-              <input type="text" class="form-control" wire:model.defer="titulo" placeholder="Ej. Mi archivo de trabajo" />
+              <input type="text" class="form-control" wire:model.defer="titulo" placeholder="Ej. Mi archivo de trabajo" @disabled(!$disponible) />
             </div>
             <div class="mb-3">
               <label class="form-label">Archivo</label>
-              <input type="file" class="form-control" wire:model="archivo" />
+              <input type="file" class="form-control" wire:model="archivo" @disabled(!$disponible) />
               @error('archivo') <div class="text-danger small">{{ $message }}</div> @enderror
               <div class="small text-muted mt-1" wire:loading wire:target="archivo">Cargando archivo...</div>
             </div>
-            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="archivo,subir">
+            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="archivo,subir" @disabled(!$disponible)>
               <span wire:loading.remove wire:target="archivo,subir">Subir recurso</span>
               <span wire:loading wire:target="archivo,subir">Subiendo...</span>
             </button>

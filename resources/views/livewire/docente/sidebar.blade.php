@@ -14,9 +14,9 @@
     </a>
   </li>
   <li class="nav-item">
-    <a href="{{ route('docente.calificar') }}" class="nav-link {{ request()->routeIs('docente.calificar') ? 'active' : '' }}">
-      <i class="nav-icon fas fa-check-square"></i>
-      <p>Calificar</p>
+    <a href="{{ route('docente.reportes') }}" class="nav-link {{ request()->routeIs('docente.reportes') ? 'active' : '' }}">
+      <i class="nav-icon fas fa-chart-bar"></i>
+      <p>Reportes</p>
     </a>
   </li>
   {{-- En el futuro: listado general de actividades --}}
