@@ -12,6 +12,18 @@ class Alumno extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'user_id',
+        'nombre_1',
+        'nombre_2',
+        'apellido_1',
+        'apellido_2',
+        'dni',
+        'genero_id',
+        'observacion',
+        'aula_id',
+    ];
+
     static public function camposTabla(){
         return [
             ['ID', 'at', ['id']],

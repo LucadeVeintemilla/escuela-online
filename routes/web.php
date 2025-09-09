@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::view('/', 'welcome');
+// Redirect root to login to use the customized AdminLTE guest layout
+Route::redirect('/', '/login')->name('home');
 
 // Unified dashboard redirect based on role
 Route::get('dashboard', function () {
@@ -31,7 +32,7 @@ Route::get('dashboard', function () {
     }
     // Default to Admin main panel
     return redirect()->route('app');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -46,7 +47,7 @@ Route::post('logout', function() {
 })->middleware(['auth'])->name('logout');
 
 // Docente dashboard (solo usuarios con rol Docente)
-Route::middleware(['auth', 'verified', 'role:Docente'])->group(function () {
+Route::middleware(['auth', 'role:Docente'])->group(function () {
     Route::redirect('docente', 'docente/cursos')->name('docente.dashboard');
     Route::view('docente/calificar', 'livewire.docente.calificar-page')->name('docente.calificar');
     Route::view('docente/cursos', 'livewire.docente.cursos-page')->name('docente.cursos');
@@ -65,15 +66,15 @@ Route::get('app', function () {
     }
     // Para otros roles, redirigir a su dashboard unificado
     return redirect()->route('dashboard');
-})->middleware(['auth', 'verified'])->name('app');
+})->middleware(['auth'])->name('app');
 
 // Admin: asignaciones de docente (aula y materias)
-Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
+Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('admin/asignaciones', \App\Livewire\AdminAsignaciones::class)->name('admin.asignaciones');
 });
 
 // Alumno (perfil estudiante)
-Route::middleware(['auth', 'verified', 'role:Alumno'])->group(function () {
+Route::middleware(['auth', 'role:Alumno'])->group(function () {
     Route::view('alumno/actividades', 'livewire.alumno.actividades-page')->name('alumno.actividades');
     Route::view('alumno/actividad', 'livewire.alumno.actividad-page')->name('alumno.actividad');
     Route::view('alumno/mi-aula', 'livewire.alumno.mi-aula-page')->name('alumno.mi-aula');
