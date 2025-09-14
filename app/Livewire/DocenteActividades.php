@@ -27,6 +27,7 @@ class DocenteActividades extends Component
     public ?string $form_descripcion = null;
     public ?string $form_inicio = null; // datetime-local
     public ?string $form_fin = null;    // datetime-local
+    public ?int $form_max_intentos = null; // null = ilimitado
 
     // Recurso opcional del docente
     public $archivoDocente; // Livewire temp file
@@ -44,6 +45,7 @@ class DocenteActividades extends Component
             'form_descripcion' => ['nullable','string','max:500'],
             'form_inicio' => ['required','date'],
             'form_fin' => ['required','date','after_or_equal:form_inicio'],
+            'form_max_intentos' => ['nullable','integer','min:0'],
             'archivoDocente' => ['nullable','file','max:20480','mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,mp3,mp4,avi,mov,mpeg,ogg,webm,zip,rar,7z,jpg,jpeg,png'],
             'recursoTitulo' => ['nullable','string','max:255'],
         ];
@@ -112,7 +114,9 @@ class DocenteActividades extends Component
         $this->form_descripcion = $act->descripcion;
         $this->form_inicio = $act->inicio ? date('Y-m-d\TH:i', strtotime($act->inicio)) : null;
         $this->form_fin = $act->fin ? date('Y-m-d\TH:i', strtotime($act->fin)) : null;
+        $this->form_max_intentos = $act->max_intentos;
         $this->mostrarFormulario = true;
+        $this->cargarRecursosActividad($act->id);
     }
 
     public function guardar(): void
@@ -134,6 +138,7 @@ class DocenteActividades extends Component
                 'inicio' => $this->form_inicio ? date('Y-m-d H:i:s', strtotime($this->form_inicio)) : null,
                 'fin' => $this->form_fin ? date('Y-m-d H:i:s', strtotime($this->form_fin)) : null,
                 'observacion' => null,
+                'max_intentos' => $this->form_max_intentos,
             ]);
             $this->mensaje = 'Actividad actualizada correctamente.';
             // Si hay archivo, subirlo y vincular a la actividad
@@ -153,6 +158,7 @@ class DocenteActividades extends Component
                 'docente_id' => $this->docente->id,
                 'aula_id' => $this->aula_id,
                 'asignatura_grado_id' => $this->asignatura_grado_id,
+                'max_intentos' => $this->form_max_intentos,
             ]);
             $this->mensaje = 'Actividad creada correctamente.';
             if ($this->archivoDocente) {
@@ -238,6 +244,7 @@ class DocenteActividades extends Component
         $this->form_fin = null;
         $this->archivoDocente = null;
         $this->recursoTitulo = null;
+        $this->form_max_intentos = null;
     }
 
     protected function cargarRecursosActividad(int $actividadId): void

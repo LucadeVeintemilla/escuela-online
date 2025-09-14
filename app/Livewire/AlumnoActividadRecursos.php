@@ -21,10 +21,16 @@ class AlumnoActividadRecursos extends Component
     public array $recursos = [];
     public string $mensaje = '';
     public bool $disponible = true;
+    public int $intentosUsados = 0;
+    public ?int $intentosMax = null; // null o 0 = ilimitado
 
     // Upload inputs
     public $archivo; // Livewire temporary file
     public ?string $titulo = null;
+    // Edición de recursos del alumno
+    public ?int $editRecursoId = null;
+    public ?string $editRecursoTitulo = null;
+    public $replaceArchivo = null; // Livewire temporary file para reemplazo
 
     protected function rules(): array
     {
@@ -50,6 +56,7 @@ class AlumnoActividadRecursos extends Component
 
         $this->cargarRecursos();
         $this->actualizarDisponibilidad();
+        $this->cargarIntentos();
         $this->dispatch('debug', ['where' => 'mount', 'actividad_id' => $this->actividad->id, 'alumno_id' => $this->alumno->id]);
     }
 
@@ -63,6 +70,23 @@ class AlumnoActividadRecursos extends Component
         );
         if (!$this->disponible && empty($this->mensaje)) {
             $this->mensaje = 'La actividad no está disponible para subir recursos en este momento.';
+        }
+    }
+
+    protected function cargarIntentos(): void
+    {
+        if (!$this->actividad || !$this->alumno) { $this->intentosUsados = 0; $this->intentosMax = null; return; }
+        $this->intentosMax = $this->actividad->max_intentos ?: null; // 0/null => ilimitado
+        // Contar recursos subidos por este alumno para esta actividad
+        $this->intentosUsados = \App\Models\Contenido::where('actividad_id', $this->actividad->id)
+            ->where('alumno_id', $this->alumno->id)
+            ->count();
+        // Si hay límite y ya alcanzó o superó, bloquear
+        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
+            $this->disponible = false;
+            if (empty($this->mensaje)) {
+                $this->mensaje = 'Has alcanzado el número máximo de intentos permitidos para esta actividad.';
+            }
         }
     }
 
@@ -89,10 +113,17 @@ class AlumnoActividadRecursos extends Component
         $this->validate();
         if (!$this->actividad || !$this->alumno) { Log::warning('Missing actividad or alumno'); return; }
         $this->actualizarDisponibilidad();
+        $this->cargarIntentos();
         if (!$this->disponible) {
             $now = now();
             $this->dispatch('debug', ['where' => 'subir:blocked_by_window', 'inicio' => (string)$this->actividad->inicio, 'fin' => (string)$this->actividad->fin, 'now' => (string)$now]);
             Log::info('Upload blocked by availability window', ['inicio' => (string)$this->actividad->inicio, 'fin' => (string)$this->actividad->fin, 'now' => (string)$now]);
+            return;
+        }
+        // Check attempts
+        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
+            $this->mensaje = 'Has alcanzado el número máximo de intentos.';
+            $this->dispatch('debug', ['where' => 'subir:blocked_by_attempts', 'usados' => $this->intentosUsados, 'max' => $this->intentosMax]);
             return;
         }
 
@@ -143,6 +174,71 @@ class AlumnoActividadRecursos extends Component
         $this->reset(['archivo','titulo']);
         $this->dispatch('notify', ['type' => 'success', 'message' => 'Recurso subido.']);
         $this->cargarRecursos();
+        $this->cargarIntentos();
+    }
+
+    // ===== CRUD del alumno sobre sus propios recursos =====
+    public function iniciarEditarRecurso(int $recursoId): void
+    {
+        if (!$this->alumno) return;
+        $recurso = Contenido::where('id', $recursoId)
+            ->where('alumno_id', $this->alumno->id)->first();
+        if (!$recurso) { $this->mensaje = 'No puedes editar este recurso.'; return; }
+        $this->editRecursoId = $recurso->id;
+        $this->editRecursoTitulo = $recurso->contenido;
+        $this->replaceArchivo = null;
+    }
+
+    public function guardarRecursoEditado(): void
+    {
+        if (!$this->alumno || !$this->editRecursoId) return;
+        // Validaciones: título requerido; archivo reemplazo opcional con reglas
+        $this->validateOnly('editRecursoTitulo', ['editRecursoTitulo' => 'required|string|max:255']);
+        if ($this->replaceArchivo) {
+            $this->validateOnly('replaceArchivo', ['replaceArchivo' => 'file|max:20480|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,mp3,mp4,avi,mov,mpeg,ogg,webm,zip,rar,7z,jpg,jpeg,png']);
+        }
+
+        $recurso = Contenido::where('id', $this->editRecursoId)
+            ->where('alumno_id', $this->alumno->id)->first();
+        if (!$recurso) { $this->mensaje = 'No puedes editar este recurso.'; return; }
+
+        // Actualizar título
+        $recurso->contenido = $this->editRecursoTitulo;
+
+        // Reemplazar archivo si se proporcionó
+        if ($this->replaceArchivo) {
+            if ($recurso->path && \Storage::disk('public')->exists($recurso->path)) {
+                \Storage::disk('public')->delete($recurso->path);
+            }
+            $original = $this->replaceArchivo->getClientOriginalName();
+            $name = uniqid('rec_')."_".$original;
+            $path = $this->replaceArchivo->storeAs('actividad_recursos/'.$this->actividad->id, $name, 'public');
+            $recurso->path = $path;
+        }
+
+        $recurso->save();
+        $this->mensaje = 'Recurso actualizado.';
+        $this->editRecursoId = null;
+        $this->editRecursoTitulo = null;
+        $this->replaceArchivo = null;
+        $this->cargarRecursos();
+        $this->cargarIntentos();
+    }
+
+
+    public function eliminarRecurso(int $recursoId): void
+    {
+        if (!$this->alumno) return;
+        $recurso = Contenido::where('id', $recursoId)
+            ->where('alumno_id', $this->alumno->id)->first();
+        if (!$recurso) { $this->mensaje = 'No puedes eliminar este recurso.'; return; }
+        if ($recurso->path && \Storage::disk('public')->exists($recurso->path)) {
+            \Storage::disk('public')->delete($recurso->path);
+        }
+        $recurso->delete();
+        $this->mensaje = 'Recurso eliminado.';
+        $this->cargarRecursos();
+        $this->cargarIntentos();
     }
 
     public function render()

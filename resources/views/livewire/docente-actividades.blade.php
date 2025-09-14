@@ -38,6 +38,13 @@
                 @error('form_fin') <div class="invalid-feedback">{{ $message }}</div> @enderror
               </div>
 
+              <div class="col-md-3">
+                <label class="form-label">Número de intentos (alumno)</label>
+                <input type="number" min="0" class="form-control @error('form_max_intentos') is-invalid @enderror" wire:model.defer="form_max_intentos" placeholder="Ej. 1, 2... (vacío o 0 = ilimitado)" />
+                @error('form_max_intentos') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <small class="text-muted">0 o vacío significa ilimitado. Controla cuántas veces puede reemplazar su envío.</small>
+              </div>
+
               <div class="col-md-6">
                 <label class="form-label">Recurso del docente (opcional) — Título</label>
                 <input type="text" class="form-control @error('recursoTitulo') is-invalid @enderror" wire:model.defer="recursoTitulo" placeholder="Ej. Guía de trabajo" />

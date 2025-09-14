@@ -22,6 +22,7 @@ class Actividad extends Model
         'docente_id',
         'aula_id',
         'asignatura_grado_id',
+        'max_intentos',
     ];
 
     static public function camposTabla(){
