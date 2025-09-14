@@ -63,18 +63,19 @@
             @php $restantes = max(0, $intentosMax - $intentosUsados); @endphp
             <div class="alert alert-secondary py-2">Intentos usados: {{ $intentosUsados }} / {{ $intentosMax }} — Restantes: {{ $restantes }}</div>
           @endif
+          @php $exhausted = $intentosMax !== null && $intentosUsados >= $intentosMax; @endphp
           <form wire:submit.prevent="subir">
             <div class="mb-3">
               <label class="form-label">Título (opcional)</label>
-              <input type="text" class="form-control" wire:model.defer="titulo" placeholder="Ej. Mi archivo de trabajo" @disabled(!$disponible) />
+              <input type="text" class="form-control" wire:model.defer="titulo" placeholder="Ej. Mi archivo de trabajo" @disabled(!$disponible || $exhausted) />
             </div>
             <div class="mb-3">
               <label class="form-label">Archivo</label>
-              <input type="file" class="form-control" wire:model="archivo" @disabled(!$disponible) />
+              <input type="file" class="form-control" wire:model="archivo" @disabled(!$disponible || $exhausted) />
               @error('archivo') <div class="text-danger small">{{ $message }}</div> @enderror
               <div class="small text-muted mt-1" wire:loading wire:target="archivo">Cargando archivo...</div>
             </div>
-            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="archivo,subir" @disabled(!$disponible)>
+            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="archivo,subir" @disabled(!$disponible || $exhausted)>
               <span wire:loading.remove wire:target="archivo,subir">Subir recurso</span>
               <span wire:loading wire:target="archivo,subir">Subiendo...</span>
             </button>
@@ -112,8 +113,10 @@
                         <small class="text-muted">{{ $r['fecha'] }}</small>
                       </div>
                       <div>
-                        <button class="btn btn-sm btn-outline-primary mr-1" wire:click="iniciarEditarRecurso({{ $r['id'] }})">Editar</button>
-                        <button class="btn btn-sm btn-outline-danger" wire:click="eliminarRecurso({{ $r['id'] }})">Eliminar</button>
+                        @if (!$exhausted)
+                          <button class="btn btn-sm btn-outline-primary mr-1" wire:click="iniciarEditarRecurso({{ $r['id'] }})">Editar</button>
+                          <button class="btn btn-sm btn-outline-danger" wire:click="eliminarRecurso({{ $r['id'] }})">Eliminar</button>
+                        @endif
                         @if (!empty($r['url']))
                           <a class="btn btn-sm btn-outline-secondary ml-1" href="{{ $r['url'] }}" target="_blank">Ver</a>
                         @endif

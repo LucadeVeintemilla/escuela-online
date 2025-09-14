@@ -8,6 +8,7 @@ use App\Models\Contenido;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -64,12 +65,18 @@ class AlumnoActividadRecursos extends Component
     {
         if (!$this->actividad) { $this->disponible = false; return; }
         $now = now();
-        $this->disponible = !(
-            ($this->actividad->inicio && $now->lt($this->actividad->inicio)) ||
-            ($this->actividad->fin && $now->gt($this->actividad->fin))
-        );
+        $fueraDeRango = ($this->actividad->inicio && $now->lt($this->actividad->inicio)) ||
+                       ($this->actividad->fin && $now->gt($this->actividad->fin));
+        
+        // Bloquear solo si está fuera del rango de fechas
+        $this->disponible = !$fueraDeRango;
+        
+        // Actualizar mensaje si es necesario (solo si no hay otro mensaje previo)
         if (!$this->disponible && empty($this->mensaje)) {
             $this->mensaje = 'La actividad no está disponible para subir recursos en este momento.';
+        } elseif ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
+            // Si se agotaron los intentos, mostrar mensaje pero mantener acceso de solo lectura
+            $this->mensaje = 'Has alcanzado el número máximo de intentos. Ya no puedes subir ni editar recursos, pero puedes ver tus envíos anteriores.';
         }
     }
 
@@ -77,17 +84,11 @@ class AlumnoActividadRecursos extends Component
     {
         if (!$this->actividad || !$this->alumno) { $this->intentosUsados = 0; $this->intentosMax = null; return; }
         $this->intentosMax = $this->actividad->max_intentos ?: null; // 0/null => ilimitado
-        // Contar recursos subidos por este alumno para esta actividad
-        $this->intentosUsados = \App\Models\Contenido::where('actividad_id', $this->actividad->id)
+        // Contar intentos registrados (subidas y ediciones) por este alumno para esta actividad
+        $this->intentosUsados = (int) DB::table('actividad_intentos')
+            ->where('actividad_id', $this->actividad->id)
             ->where('alumno_id', $this->alumno->id)
             ->count();
-        // Si hay límite y ya alcanzó o superó, bloquear
-        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
-            $this->disponible = false;
-            if (empty($this->mensaje)) {
-                $this->mensaje = 'Has alcanzado el número máximo de intentos permitidos para esta actividad.';
-            }
-        }
     }
 
     protected function cargarRecursos(): void
@@ -110,20 +111,23 @@ class AlumnoActividadRecursos extends Component
     {
         Log::info('AlumnoActividadRecursos.subir called');
         $this->dispatch('debug', ['where' => 'subir:called']);
-        $this->validate();
-        if (!$this->actividad || !$this->alumno) { Log::warning('Missing actividad or alumno'); return; }
-        $this->actualizarDisponibilidad();
-        $this->cargarIntentos();
-        if (!$this->disponible) {
-            $now = now();
-            $this->dispatch('debug', ['where' => 'subir:blocked_by_window', 'inicio' => (string)$this->actividad->inicio, 'fin' => (string)$this->actividad->fin, 'now' => (string)$now]);
-            Log::info('Upload blocked by availability window', ['inicio' => (string)$this->actividad->inicio, 'fin' => (string)$this->actividad->fin, 'now' => (string)$now]);
+        
+        // Verificar intentos máximos primero
+        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
+            $this->mensaje = 'Has alcanzado el número máximo de intentos. No puedes subir más recursos.';
             return;
         }
-        // Check attempts
-        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
-            $this->mensaje = 'Has alcanzado el número máximo de intentos.';
-            $this->dispatch('debug', ['where' => 'subir:blocked_by_attempts', 'usados' => $this->intentosUsados, 'max' => $this->intentosMax]);
+        
+        $this->validate();
+        if (!$this->actividad || !$this->alumno) { 
+            Log::warning('Missing actividad or alumno'); 
+            return; 
+        }
+        
+        $this->actualizarDisponibilidad();
+        if (!$this->disponible) {
+            $this->dispatch('debug', ['where' => 'subir:blocked', 'motivo' => 'fuera_de_rango']);
+            Log::info('Upload blocked by availability window');
             return;
         }
 
@@ -159,6 +163,15 @@ class AlumnoActividadRecursos extends Component
             $recurso->save();
             Log::info('Contenido guardado', ['contenido_id' => $recurso->id, 'alumno_id' => $this->alumno->id, 'actividad_id' => $this->actividad->id]);
             $this->dispatch('debug', ['where' => 'subir:saved_db', 'contenido_id' => $recurso->id]);
+
+            // Log de intento por subida
+            DB::table('actividad_intentos')->insert([
+                'actividad_id' => $this->actividad->id,
+                'alumno_id' => $this->alumno->id,
+                'tipo' => 'upload',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         } catch (\Throwable $e) {
             // Si falla el guardado, revertir archivo y reportar
             if ($path && \Storage::disk('public')->exists($path)) {
@@ -181,9 +194,17 @@ class AlumnoActividadRecursos extends Component
     public function iniciarEditarRecurso(int $recursoId): void
     {
         if (!$this->alumno) return;
+        
+        // Verificar intentos máximos
+        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
+            $this->mensaje = 'Has alcanzado el número máximo de intentos. Ya no puedes editar recursos.';
+            return;
+        }
+        
         $recurso = Contenido::where('id', $recursoId)
             ->where('alumno_id', $this->alumno->id)->first();
         if (!$recurso) { $this->mensaje = 'No puedes editar este recurso.'; return; }
+            
         $this->editRecursoId = $recurso->id;
         $this->editRecursoTitulo = $recurso->contenido;
         $this->replaceArchivo = null;
@@ -217,6 +238,14 @@ class AlumnoActividadRecursos extends Component
         }
 
         $recurso->save();
+        // Log de intento por edición
+        DB::table('actividad_intentos')->insert([
+            'actividad_id' => $this->actividad->id,
+            'alumno_id' => $this->alumno->id,
+            'tipo' => 'edit',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         $this->mensaje = 'Recurso actualizado.';
         $this->editRecursoId = null;
         $this->editRecursoTitulo = null;
@@ -229,9 +258,17 @@ class AlumnoActividadRecursos extends Component
     public function eliminarRecurso(int $recursoId): void
     {
         if (!$this->alumno) return;
+        
+        // Verificar intentos máximos
+        if ($this->intentosMax !== null && $this->intentosUsados >= $this->intentosMax) {
+            $this->mensaje = 'Has alcanzado el número máximo de intentos. Ya no puedes eliminar recursos.';
+            return;
+        }
+        
         $recurso = Contenido::where('id', $recursoId)
             ->where('alumno_id', $this->alumno->id)->first();
         if (!$recurso) { $this->mensaje = 'No puedes eliminar este recurso.'; return; }
+        
         if ($recurso->path && \Storage::disk('public')->exists($recurso->path)) {
             \Storage::disk('public')->delete($recurso->path);
         }
