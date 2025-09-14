@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:Docente'])->group(function () {
     Route::redirect('docente', 'docente/cursos')->name('docente.dashboard');
     Route::view('docente/calificar', 'livewire.docente.calificar-page')->name('docente.calificar');
     Route::view('docente/cursos', 'livewire.docente.cursos-page')->name('docente.cursos');
+    Route::view('docente/estudiantes', 'livewire.docente.estudiantes-page')->name('docente.estudiantes');
     Route::view('docente/reportes', 'livewire.docente.reportes-page')->name('docente.reportes');
     Route::view('docente/actividades', 'livewire.docente.actividades-page')->name('docente.actividades');
     Route::view('docente/actividad/calificar', 'livewire.docente.calificar-actividad-page')->name('docente.actividad.calificar');

@@ -14,6 +14,12 @@
     </a>
   </li>
   <li class="nav-item">
+    <a href="{{ route('docente.estudiantes') }}" class="nav-link {{ request()->routeIs('docente.estudiantes') ? 'active' : '' }}">
+      <i class="nav-icon fas fa-user-graduate"></i>
+      <p>Mis Estudiantes</p>
+    </a>
+  </li>
+  <li class="nav-item">
     <a href="{{ route('docente.reportes') }}" class="nav-link {{ request()->routeIs('docente.reportes') ? 'active' : '' }}">
       <i class="nav-icon fas fa-chart-bar"></i>
       <p>Reportes</p>
