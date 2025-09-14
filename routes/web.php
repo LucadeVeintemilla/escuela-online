@@ -48,7 +48,8 @@ Route::post('logout', function() {
 
 // Docente dashboard (solo usuarios con rol Docente)
 Route::middleware(['auth', 'role:Docente'])->group(function () {
-    Route::redirect('docente', 'docente/cursos')->name('docente.dashboard');
+    Route::redirect('docente', 'docente/inicio')->name('docente.dashboard');
+    Route::view('docente/inicio', 'livewire.docente.inicio-page')->name('docente.inicio');
     Route::view('docente/calificar', 'livewire.docente.calificar-page')->name('docente.calificar');
     Route::view('docente/cursos', 'livewire.docente.cursos-page')->name('docente.cursos');
     Route::view('docente/estudiantes', 'livewire.docente.estudiantes-page')->name('docente.estudiantes');
@@ -76,9 +77,25 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
 // Alumno (perfil estudiante)
 Route::middleware(['auth', 'role:Alumno'])->group(function () {
+    Route::view('alumno/inicio', 'livewire.alumno.inicio-page')->name('alumno.inicio');
     Route::view('alumno/actividades', 'livewire.alumno.actividades-page')->name('alumno.actividades');
     Route::view('alumno/actividad', 'livewire.alumno.actividad-page')->name('alumno.actividad');
     Route::view('alumno/mi-aula', 'livewire.alumno.mi-aula-page')->name('alumno.mi-aula');
 });
 
+// Admin: anuncios gestión
+Route::middleware(['auth', 'role:Admin'])->group(function () {
+    Route::view('admin/anuncios', 'livewire.admin-anuncios-page')->name('admin.anuncios');
+});
+
 require __DIR__.'/auth.php';
+
+// Fallback to serve files from public storage if the symlink is not working (useful on Windows/OneDrive)
+Route::get('storage/{path}', function (string $path) {
+    $clean = ltrim($path, '/');
+    $full = storage_path('app/public/'.str_replace(['..', '\\'], ['', '/'], $clean));
+    if (file_exists($full)) {
+        return response()->file($full);
+    }
+    abort(404);
+})->where('path', '.*');

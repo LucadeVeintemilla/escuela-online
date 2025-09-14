@@ -178,6 +178,15 @@
             {{-- Admin: Actividades Curriculares (docente + asignatura_grado + aula) --}}
             @livewire('admin-actividades-curriculares')
         @break
+
+        @case('22')
+            {{-- Admin: Anuncios dentro del SPA (/app#) --}}
+            <section class="content">
+                <div class="container-fluid">
+                    @livewire('admin-anuncios')
+                </div>
+            </section>
+        @break
         
         @default
             {{--  --}}

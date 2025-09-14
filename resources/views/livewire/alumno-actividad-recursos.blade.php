@@ -8,26 +8,6 @@
         @if ($mensaje)
           <div class="alert alert-warning">{{ $mensaje }}</div>
         @else
-          @if (!$disponible)
-            <div class="alert alert-info">Esta actividad no está disponible para subir recursos en este momento.</div>
-          @endif
-          <form wire:submit.prevent="subir">
-            <div class="mb-3">
-              <label class="form-label">Título (opcional)</label>
-              <input type="text" class="form-control" wire:model.defer="titulo" placeholder="Ej. Mi archivo de trabajo" @disabled(!$disponible) />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Archivo</label>
-              <input type="file" class="form-control" wire:model="archivo" @disabled(!$disponible) />
-              @error('archivo') <div class="text-danger small">{{ $message }}</div> @enderror
-              <div class="small text-muted mt-1" wire:loading wire:target="archivo">Cargando archivo...</div>
-            </div>
-            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="archivo,subir" @disabled(!$disponible)>
-              <span wire:loading.remove wire:target="archivo,subir">Subir recurso</span>
-              <span wire:loading wire:target="archivo,subir">Subiendo...</span>
-            </button>
-          </form>
-
           <script>
             (function(){
               console.log('[AlumnoActividadRecursos] Debug script loaded');
@@ -51,17 +31,17 @@
             })();
           </script>
 
-          <hr />
-          <h5 class="mt-4">Recursos</h5>
-          @if (empty($recursos))
-            <div class="alert alert-info">Aún no hay recursos en esta actividad.</div>
+          <h5 class="mt-2">Recursos subidos por el docente</h5>
+          @php $recursosDocente = array_values(array_filter($recursos, fn($x) => ($x['propietario'] ?? '') !== 'Alumno')); @endphp
+          @if (empty($recursosDocente))
+            <div class="alert alert-info">Aún no hay recursos del docente en esta actividad.</div>
           @else
-            <ul class="list-group">
-              @foreach ($recursos as $r)
+            <ul class="list-group mb-3">
+              @foreach ($recursosDocente as $r)
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <div class="fw-bold">{{ $r['titulo'] }}</div>
-                    <small class="text-muted">{{ $r['propietario'] }} • {{ $r['fecha'] }}</small>
+                    <small class="text-muted">{{ $r['fecha'] }}</small>
                   </div>
                   <div>
                     @if ($r['url'])
@@ -72,6 +52,27 @@
               @endforeach
             </ul>
           @endif
+
+          <hr />
+          @if (!$disponible)
+            <div class="alert alert-info">Esta actividad no está disponible para subir recursos en este momento.</div>
+          @endif
+          <form wire:submit.prevent="subir">
+            <div class="mb-3">
+              <label class="form-label">Título (opcional)</label>
+              <input type="text" class="form-control" wire:model.defer="titulo" placeholder="Ej. Mi archivo de trabajo" @disabled(!$disponible) />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Archivo</label>
+              <input type="file" class="form-control" wire:model="archivo" @disabled(!$disponible) />
+              @error('archivo') <div class="text-danger small">{{ $message }}</div> @enderror
+              <div class="small text-muted mt-1" wire:loading wire:target="archivo">Cargando archivo...</div>
+            </div>
+            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="archivo,subir" @disabled(!$disponible)>
+              <span wire:loading.remove wire:target="archivo,subir">Subir recurso</span>
+              <span wire:loading wire:target="archivo,subir">Subiendo...</span>
+            </button>
+          </form>
         @endif
       </div>
     </div>

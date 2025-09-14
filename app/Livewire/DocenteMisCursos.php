@@ -61,6 +61,15 @@ class DocenteMisCursos extends Component
         return redirect()->route('docente.actividades', ['aula_id' => $aula_id, 'asignatura_grado_id' => $asignatura_grado_id]);
     }
 
+    public function irNuevaActividad($aula_id, $asignatura_grado_id)
+    {
+        return redirect()->route('docente.actividades', [
+            'aula_id' => $aula_id,
+            'asignatura_grado_id' => $asignatura_grado_id,
+            'crear' => 1,
+        ]);
+    }
+
     public function render()
     {
         return view('livewire.docente-mis-cursos');

@@ -22,9 +22,14 @@
                           <span class="badge badge-pill badge-info ml-2">{{ $m['actividades_count'] ?? 0 }}</span>
                         </div>
                         @php $disabled = ($m['actividades_count'] ?? 0) === 0; @endphp
-                        <button class="btn btn-primary btn-sm" @if($disabled) disabled title="Sin actividades" @endif wire:click="irActividades({{ $curso['aula_id'] }}, {{ $m['asignatura_grado_id'] }})">
-                          Ver actividades
-                        </button>
+                        <div class="btn-group">
+                          <button class="btn btn-primary btn-sm" @if($disabled) disabled title="Sin actividades" @endif wire:click="irActividades({{ $curso['aula_id'] }}, {{ $m['asignatura_grado_id'] }})">
+                            Ver actividades
+                          </button>
+                          <button class="btn btn-success btn-sm" title="Nueva actividad" wire:click="irNuevaActividad({{ $curso['aula_id'] }}, {{ $m['asignatura_grado_id'] }})">
+                            Nueva actividad
+                          </button>
+                        </div>
                       </div>
                     </div>
                   @endforeach

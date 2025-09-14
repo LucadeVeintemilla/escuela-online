@@ -14,6 +14,10 @@
             ['tituloOpcion' => 'Docencia',
              'iconoOpcion' => 'pie-chart', 
              'tituloAreaTrabajo' => 'Cuadros de Mando', 
-             'codigoAreaTrabajo' => '00'],]]
+             'codigoAreaTrabajo' => '00'],
+            ['tituloOpcion' => 'Anuncios',
+             'iconoOpcion' => 'megaphone',
+             'tituloAreaTrabajo' => 'Anuncios',
+             'codigoAreaTrabajo' => '22'],]]
     )
 </li>
