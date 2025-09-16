@@ -2,12 +2,15 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
+        <livewire:docente-anuncios />
+      </div>
+      <div class="col-12 mt-3">
         <div class="card card-default">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Inicio</h3>
+            <h3 class="card-title">Noticias</h3>
           </div>
           <div class="card-body">
-            <h5 class="mb-3">Noticias</h5>
+            <h5 class="mb-3">Listado</h5>
             @if (empty($anuncios))
               <div class="alert alert-info">No hay anuncios disponibles.</div>
             @else
