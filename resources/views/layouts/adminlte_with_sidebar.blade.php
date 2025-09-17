@@ -68,8 +68,8 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
-      <img src="/admin-lte/dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Escuela Online</span>
+      <img src="/images/Logoescuela.png" alt="Institucion Educativa 15005" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">Institucion 15005</span>
     </a>
 
     <!-- Sidebar -->

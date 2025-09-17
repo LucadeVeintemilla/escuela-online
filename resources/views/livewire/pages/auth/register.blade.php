@@ -160,7 +160,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         <!-- Password -->
         <div class="form-group mb-3">
-            <x-input-label for="password" :value="__('Password')" class="form-label" />
+            <x-input-label for="password" :value="__('Contraseña')" class="form-label" />
 
             <x-text-input wire:model="password" id="password" class="form-control"
                             type="password"
@@ -172,7 +172,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         <!-- Confirm Password -->
         <div class="form-group mb-3">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="form-label" />
+            <x-input-label for="password_confirmation" :value="__('Confirma tu contraseña')" class="form-label" />
 
             <x-text-input wire:model="password_confirmation" id="password_confirmation" class="form-control"
                             type="password"
@@ -183,11 +183,11 @@ new #[Layout('layouts.guest')] class extends Component
 
         <div class="d-flex justify-content-between align-items-center">
             <a class="small" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
+                {{ __('Ya tienes una cuenta?') }}
             </a>
 
             <x-primary-button class="btn btn-primary">
-                {{ __('Register') }}
+                {{ __('Registrar') }}
             </x-primary-button>
         </div>
     </form>

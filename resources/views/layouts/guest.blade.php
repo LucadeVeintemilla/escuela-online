@@ -25,8 +25,11 @@
   <body class="hold-transition login-page" style="min-height: 100vh;">
     <div class="login-box">
       <div class="login-logo">
-        <a href="/" class="text-decoration-none">
-          <span class="font-weight-bold">{{ config('app.name', 'Escuela Online') }}</span>
+        <a href="/" class="text-decoration-none d-block">
+          <img src="/images/Logoescuela.png" alt="Institucion Educativa 15005" style="width: 150px; max-width: 100%; height: auto;" class="mb-2">
+          <div class="font-weight-bold" style="font-size: 1.25rem;">
+            Institucion Educativa 15005
+          </div>
         </a>
       </div>
 
